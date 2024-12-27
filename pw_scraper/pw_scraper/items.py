@@ -16,6 +16,7 @@ class ScientistItem(Item):
     organization_id = Field()
     profile_url = Field()
     identifier  = Field()
+    name = Field()
 
 class BibliometricsItem(Item):
     identifier = Field()
