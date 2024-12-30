@@ -1,0 +1,331 @@
+2024-12-30 18:55:58 [scrapy.utils.log] INFO: Scrapy 2.12.0 started (bot: pw_scraper)
+2024-12-30 18:55:59 [scrapy.utils.log] INFO: Versions: lxml 5.3.0.0, libxml2 2.11.7, cssselect 1.2.0, parsel 1.9.1, w3lib 2.2.1, Twisted 24.11.0, Python 3.13.0 (tags/v3.13.0:60403a5, Oct  7 2024, 09:38:07) [MSC v.1941 64 bit (AMD64)], pyOpenSSL 24.3.0 (OpenSSL 3.4.0 22 Oct 2024), cryptography 44.0.0, Platform Windows-11-10.0.22631-SP0
+2024-12-30 18:55:59 [scrapy.addons] INFO: Enabled addons:
+[]
+2024-12-30 18:55:59 [py.warnings] WARNING: C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\scrapy\utils\request.py:120: ScrapyDeprecationWarning: 'REQUEST_FINGERPRINTER_IMPLEMENTATION' is a deprecated setting.
+It will be removed in a future version of Scrapy.
+  return cls(crawler)
+
+2024-12-30 18:55:59 [scrapy.extensions.telnet] INFO: Telnet Password: d945165fd3bce17a
+2024-12-30 18:55:59 [scrapy.middleware] INFO: Enabled extensions:
+['scrapy.extensions.corestats.CoreStats',
+ 'scrapy.extensions.telnet.TelnetConsole',
+ 'scrapy.extensions.logstats.LogStats',
+ 'scrapy.extensions.throttle.AutoThrottle']
+2024-12-30 18:55:59 [scrapy.crawler] INFO: Overridden settings:
+{'AUTOTHROTTLE_ENABLED': True,
+ 'BOT_NAME': 'pw_scraper',
+ 'CONCURRENT_REQUESTS': 32,
+ 'FEED_EXPORT_ENCODING': 'utf-8',
+ 'LOG_FILE': 'scrapy_errors.log',
+ 'LOG_LEVEL': 'INFO',
+ 'NEWSPIDER_MODULE': 'pw_scraper.spiders',
+ 'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
+ 'RETRY_HTTP_CODES': [500],
+ 'RETRY_TIMES': 5,
+ 'SPIDER_MODULES': ['pw_scraper.spiders'],
+ 'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor'}
+2024-12-30 18:55:59 [scrapy-playwright] INFO: Started loop on separate thread: <ProactorEventLoop running=True closed=False debug=False>
+2024-12-30 18:55:59 [scrapy.middleware] INFO: Enabled downloader middlewares:
+['scrapy.downloadermiddlewares.offsite.OffsiteMiddleware',
+ 'scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware',
+ 'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware',
+ 'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware',
+ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware',
+ 'pw_scraper.middlewares.pw_scraperDownloaderMiddleware',
+ 'scrapy.downloadermiddlewares.retry.RetryMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware',
+ 'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.RedirectMiddleware',
+ 'scrapy.downloadermiddlewares.cookies.CookiesMiddleware',
+ 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware',
+ 'scrapy.downloadermiddlewares.stats.DownloaderStats']
+2024-12-30 18:55:59 [scrapy.middleware] INFO: Enabled spider middlewares:
+['scrapy.spidermiddlewares.httperror.HttpErrorMiddleware',
+ 'scrapy.spidermiddlewares.referer.RefererMiddleware',
+ 'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware',
+ 'scrapy.spidermiddlewares.depth.DepthMiddleware']
+2024-12-30 18:55:59 [scrapy.middleware] INFO: Enabled item pipelines:
+['pw_scraper.pipelines.SaveToJsonFile']
+2024-12-30 18:55:59 [scrapy.core.engine] INFO: Spider opened
+2024-12-30 18:55:59 [scrapy.extensions.logstats] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2024-12-30 18:55:59 [pw_spider] INFO: Spider opened: pw_spider
+2024-12-30 18:55:59 [scrapy.extensions.telnet] INFO: Telnet console listening on 127.0.0.1:6023
+2024-12-30 18:55:59 [scrapy-playwright] INFO: Starting download handler
+2024-12-30 18:55:59 [scrapy-playwright] INFO: Starting download handler
+2024-12-30 18:56:07 [scrapy-playwright] INFO: Launching browser chromium
+2024-12-30 18:56:07 [scrapy-playwright] INFO: Browser chromium launched
+2024-12-30 18:56:59 [scrapy.extensions.logstats] INFO: Crawled 5 pages (at 5 pages/min), scraped 42 items (at 42 items/min)
+2024-12-30 18:57:59 [scrapy.extensions.logstats] INFO: Crawled 19 pages (at 14 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 18:58:19 [scrapy.core.engine] INFO: Closing spider (finished)
+2024-12-30 18:58:19 [scrapy.statscollectors] INFO: Dumping Scrapy stats:
+{'downloader/request_bytes': 15580,
+ 'downloader/request_count': 23,
+ 'downloader/request_method_count/GET': 23,
+ 'downloader/response_bytes': 2603316,
+ 'downloader/response_count': 23,
+ 'downloader/response_status_count/200': 23,
+ 'elapsed_time_seconds': 140.01782,
+ 'finish_reason': 'finished',
+ 'finish_time': datetime.datetime(2024, 12, 30, 17, 58, 19, 778050, tzinfo=datetime.timezone.utc),
+ 'item_scraped_count': 42,
+ 'items_per_minute': None,
+ 'log_count/INFO': 18,
+ 'log_count/WARNING': 1,
+ 'playwright/browser_count': 1,
+ 'playwright/context_count': 2,
+ 'playwright/context_count/max_concurrent': 2,
+ 'playwright/context_count/persistent/False': 2,
+ 'playwright/context_count/remote/False': 2,
+ 'playwright/page_count': 22,
+ 'playwright/page_count/max_concurrent': 2,
+ 'playwright/request_count': 1612,
+ 'playwright/request_count/aborted': 636,
+ 'playwright/request_count/method/GET': 1581,
+ 'playwright/request_count/method/POST': 31,
+ 'playwright/request_count/navigation': 43,
+ 'playwright/request_count/resource_type/document': 43,
+ 'playwright/request_count/resource_type/fetch': 6,
+ 'playwright/request_count/resource_type/image': 239,
+ 'playwright/request_count/resource_type/script': 882,
+ 'playwright/request_count/resource_type/stylesheet': 397,
+ 'playwright/request_count/resource_type/xhr': 45,
+ 'playwright/response_count': 966,
+ 'playwright/response_count/method/GET': 939,
+ 'playwright/response_count/method/POST': 27,
+ 'playwright/response_count/resource_type/document': 43,
+ 'playwright/response_count/resource_type/fetch': 5,
+ 'playwright/response_count/resource_type/script': 876,
+ 'playwright/response_count/resource_type/xhr': 42,
+ 'request_depth_max': 3,
+ 'response_received_count': 23,
+ 'responses_per_minute': None,
+ 'scheduler/dequeued': 23,
+ 'scheduler/dequeued/memory': 23,
+ 'scheduler/enqueued': 23,
+ 'scheduler/enqueued/memory': 23,
+ 'start_time': datetime.datetime(2024, 12, 30, 17, 55, 59, 760230, tzinfo=datetime.timezone.utc)}
+2024-12-30 18:58:19 [scrapy.core.engine] INFO: Spider closed (finished)
+2024-12-30 18:58:19 [scrapy-playwright] INFO: Closing download handler
+2024-12-30 18:58:20 [scrapy-playwright] INFO: Closing download handler
+2024-12-30 18:58:20 [scrapy-playwright] INFO: Closing browser
+2024-12-30 19:27:05 [scrapy.utils.log] INFO: Scrapy 2.12.0 started (bot: pw_scraper)
+2024-12-30 19:27:05 [scrapy.utils.log] INFO: Versions: lxml 5.3.0.0, libxml2 2.11.7, cssselect 1.2.0, parsel 1.9.1, w3lib 2.2.1, Twisted 24.11.0, Python 3.13.0 (tags/v3.13.0:60403a5, Oct  7 2024, 09:38:07) [MSC v.1941 64 bit (AMD64)], pyOpenSSL 24.3.0 (OpenSSL 3.4.0 22 Oct 2024), cryptography 44.0.0, Platform Windows-11-10.0.22631-SP0
+2024-12-30 19:27:05 [scrapy.addons] INFO: Enabled addons:
+[]
+2024-12-30 19:27:05 [py.warnings] WARNING: C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\scrapy\utils\request.py:120: ScrapyDeprecationWarning: 'REQUEST_FINGERPRINTER_IMPLEMENTATION' is a deprecated setting.
+It will be removed in a future version of Scrapy.
+  return cls(crawler)
+
+2024-12-30 19:27:05 [scrapy.extensions.telnet] INFO: Telnet Password: 4be79c16c81cbdf7
+2024-12-30 19:27:05 [scrapy.middleware] INFO: Enabled extensions:
+['scrapy.extensions.corestats.CoreStats',
+ 'scrapy.extensions.telnet.TelnetConsole',
+ 'scrapy.extensions.logstats.LogStats',
+ 'scrapy.extensions.throttle.AutoThrottle']
+2024-12-30 19:27:05 [scrapy.crawler] INFO: Overridden settings:
+{'AUTOTHROTTLE_ENABLED': True,
+ 'BOT_NAME': 'pw_scraper',
+ 'CONCURRENT_REQUESTS': 32,
+ 'FEED_EXPORT_ENCODING': 'utf-8',
+ 'LOG_FILE': 'scrapy_errors.log',
+ 'LOG_LEVEL': 'INFO',
+ 'NEWSPIDER_MODULE': 'pw_scraper.spiders',
+ 'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
+ 'RETRY_HTTP_CODES': [500],
+ 'RETRY_TIMES': 5,
+ 'SPIDER_MODULES': ['pw_scraper.spiders'],
+ 'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor'}
+2024-12-30 19:27:05 [scrapy-playwright] INFO: Started loop on separate thread: <ProactorEventLoop running=True closed=False debug=False>
+2024-12-30 19:27:06 [scrapy.middleware] INFO: Enabled downloader middlewares:
+['scrapy.downloadermiddlewares.offsite.OffsiteMiddleware',
+ 'scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware',
+ 'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware',
+ 'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware',
+ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware',
+ 'pw_scraper.middlewares.pw_scraperDownloaderMiddleware',
+ 'scrapy.downloadermiddlewares.retry.RetryMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware',
+ 'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.RedirectMiddleware',
+ 'scrapy.downloadermiddlewares.cookies.CookiesMiddleware',
+ 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware',
+ 'scrapy.downloadermiddlewares.stats.DownloaderStats']
+2024-12-30 19:27:06 [scrapy.middleware] INFO: Enabled spider middlewares:
+['scrapy.spidermiddlewares.httperror.HttpErrorMiddleware',
+ 'scrapy.spidermiddlewares.referer.RefererMiddleware',
+ 'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware',
+ 'scrapy.spidermiddlewares.depth.DepthMiddleware']
+2024-12-30 19:27:06 [scrapy.middleware] INFO: Enabled item pipelines:
+['pw_scraper.pipelines.SaveToJsonFile']
+2024-12-30 19:27:06 [scrapy.core.engine] INFO: Spider opened
+2024-12-30 19:27:06 [scrapy.extensions.logstats] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2024-12-30 19:27:06 [pw_spider] INFO: Spider opened: pw_spider
+2024-12-30 19:27:06 [scrapy.extensions.telnet] INFO: Telnet console listening on 127.0.0.1:6023
+2024-12-30 19:27:06 [scrapy-playwright] INFO: Starting download handler
+2024-12-30 19:27:06 [scrapy-playwright] INFO: Starting download handler
+2024-12-30 19:27:16 [scrapy-playwright] INFO: Launching browser chromium
+2024-12-30 19:27:16 [scrapy-playwright] INFO: Browser chromium launched
+2024-12-30 19:28:06 [scrapy.extensions.logstats] INFO: Crawled 6 pages (at 6 pages/min), scraped 42 items (at 42 items/min)
+2024-12-30 19:28:28 [scrapy.utils.log] INFO: Scrapy 2.12.0 started (bot: pw_scraper)
+2024-12-30 19:28:28 [scrapy.utils.log] INFO: Versions: lxml 5.3.0.0, libxml2 2.11.7, cssselect 1.2.0, parsel 1.9.1, w3lib 2.2.1, Twisted 24.11.0, Python 3.13.0 (tags/v3.13.0:60403a5, Oct  7 2024, 09:38:07) [MSC v.1941 64 bit (AMD64)], pyOpenSSL 24.3.0 (OpenSSL 3.4.0 22 Oct 2024), cryptography 44.0.0, Platform Windows-11-10.0.22631-SP0
+2024-12-30 19:28:28 [scrapy.addons] INFO: Enabled addons:
+[]
+2024-12-30 19:28:28 [py.warnings] WARNING: C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\scrapy\utils\request.py:120: ScrapyDeprecationWarning: 'REQUEST_FINGERPRINTER_IMPLEMENTATION' is a deprecated setting.
+It will be removed in a future version of Scrapy.
+  return cls(crawler)
+
+2024-12-30 19:28:28 [scrapy.extensions.telnet] INFO: Telnet Password: 383fe50d7bf0df1a
+2024-12-30 19:28:28 [scrapy.middleware] INFO: Enabled extensions:
+['scrapy.extensions.corestats.CoreStats',
+ 'scrapy.extensions.telnet.TelnetConsole',
+ 'scrapy.extensions.logstats.LogStats',
+ 'scrapy.extensions.throttle.AutoThrottle']
+2024-12-30 19:28:28 [scrapy.crawler] INFO: Overridden settings:
+{'AUTOTHROTTLE_ENABLED': True,
+ 'BOT_NAME': 'pw_scraper',
+ 'CONCURRENT_REQUESTS': 32,
+ 'FEED_EXPORT_ENCODING': 'utf-8',
+ 'LOG_FILE': 'scrapy_errors.log',
+ 'LOG_LEVEL': 'INFO',
+ 'NEWSPIDER_MODULE': 'pw_scraper.spiders',
+ 'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
+ 'RETRY_HTTP_CODES': [500],
+ 'RETRY_TIMES': 5,
+ 'SPIDER_MODULES': ['pw_scraper.spiders'],
+ 'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor'}
+2024-12-30 19:28:28 [scrapy-playwright] INFO: Started loop on separate thread: <ProactorEventLoop running=True closed=False debug=False>
+2024-12-30 19:28:29 [scrapy.middleware] INFO: Enabled downloader middlewares:
+['scrapy.downloadermiddlewares.offsite.OffsiteMiddleware',
+ 'scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware',
+ 'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware',
+ 'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware',
+ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware',
+ 'pw_scraper.middlewares.pw_scraperDownloaderMiddleware',
+ 'scrapy.downloadermiddlewares.retry.RetryMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware',
+ 'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.RedirectMiddleware',
+ 'scrapy.downloadermiddlewares.cookies.CookiesMiddleware',
+ 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware',
+ 'scrapy.downloadermiddlewares.stats.DownloaderStats']
+2024-12-30 19:28:29 [scrapy.middleware] INFO: Enabled spider middlewares:
+['scrapy.spidermiddlewares.httperror.HttpErrorMiddleware',
+ 'scrapy.spidermiddlewares.referer.RefererMiddleware',
+ 'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware',
+ 'scrapy.spidermiddlewares.depth.DepthMiddleware']
+2024-12-30 19:28:29 [scrapy.middleware] INFO: Enabled item pipelines:
+['pw_scraper.pipelines.SaveToJsonFile']
+2024-12-30 19:28:29 [scrapy.core.engine] INFO: Spider opened
+2024-12-30 19:28:29 [scrapy.extensions.logstats] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2024-12-30 19:28:29 [pw_spider] INFO: Spider opened: pw_spider
+2024-12-30 19:28:29 [scrapy.extensions.telnet] INFO: Telnet console listening on 127.0.0.1:6023
+2024-12-30 19:28:29 [scrapy-playwright] INFO: Starting download handler
+2024-12-30 19:28:29 [scrapy-playwright] INFO: Starting download handler
+2024-12-30 19:28:39 [scrapy-playwright] INFO: Launching browser chromium
+2024-12-30 19:28:39 [scrapy-playwright] INFO: Browser chromium launched
+2024-12-30 19:29:29 [scrapy.extensions.logstats] INFO: Crawled 6 pages (at 6 pages/min), scraped 42 items (at 42 items/min)
+2024-12-30 19:30:29 [scrapy.extensions.logstats] INFO: Crawled 12 pages (at 6 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 19:31:29 [scrapy.extensions.logstats] INFO: Crawled 21 pages (at 9 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 19:32:29 [scrapy.extensions.logstats] INFO: Crawled 28 pages (at 7 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 19:32:58 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:04 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:14 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:14 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:14 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:14 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:24 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:28 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:29 [scrapy.extensions.logstats] INFO: Crawled 43 pages (at 15 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 19:33:33 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:38 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:42 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:45 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:47 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:50 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:54 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTc14b3609e44f493d9327fd99f1c3e1a5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BMagdalena%2BFlont%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:33:59 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:34:04 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTc14b3609e44f493d9327fd99f1c3e1a5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BMagdalena%2BFlont%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:34:09 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUT817d3b704a4e4a9aa3d856fb8a51d539?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BBartosz%2BMichalak%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:34:11 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:34:29 [scrapy.extensions.logstats] INFO: Crawled 54 pages (at 11 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 19:34:36 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:34:36 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:35:04 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:35:14 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:35:14 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:35:29 [scrapy.extensions.logstats] INFO: Crawled 59 pages (at 5 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 19:36:19 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:36:29 [scrapy.extensions.logstats] INFO: Crawled 60 pages (at 1 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 19:37:24 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:37:29 [scrapy.extensions.logstats] INFO: Crawled 61 pages (at 1 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 19:37:29 [scrapy.core.scraper] ERROR: Error downloading <GET https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en>
+Traceback (most recent call last):
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\twisted\internet\defer.py", line 2013, in _inlineCallbacks
+    result = context.run(
+        cast(Failure, result).throwExceptionIntoGenerator, gen
+    )
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\twisted\python\failure.py", line 467, in throwExceptionIntoGenerator
+    return g.throw(self.value.with_traceback(self.tb))
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\scrapy\core\downloader\middleware.py", line 68, in process_request
+    return (yield download_func(request, spider))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\twisted\internet\defer.py", line 1253, in adapt
+    extracted: _SelfResultT | Failure = result.result()
+                                        ~~~~~~~~~~~~~^^
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\scrapy_playwright\_utils.py", line 120, in _handle_coro
+    future.set_result(await coro)
+                      ^^^^^^^^^^
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\scrapy_playwright\handler.py", line 379, in _download_request
+    return await self._download_request_with_retry(request=request, spider=spider)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\scrapy_playwright\handler.py", line 432, in _download_request_with_retry
+    return await self._download_request_with_page(request, page, spider)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\scrapy_playwright\handler.py", line 461, in _download_request_with_page
+    response, download = await self._get_response_and_download(request, page, spider)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\scrapy_playwright\handler.py", line 563, in _get_response_and_download
+    response = await page.goto(url=request.url, **page_goto_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\playwright\async_api\_generated.py", line 8973, in goto
+    await self._impl_obj.goto(
+        url=url, timeout=timeout, waitUntil=wait_until, referer=referer
+    )
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\playwright\_impl\_page.py", line 551, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\playwright\_impl\_frame.py", line 145, in goto
+    await self._channel.send("goto", locals_to_params(locals()))
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\playwright\_impl\_connection.py", line 61, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )
+    ^
+  File "C:\Users\julia\AppData\Local\Programs\Python\Python313\Lib\site-packages\playwright\_impl\_connection.py", line 528, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Page.goto: Timeout 180000ms exceeded.
+Call log:
+  - navigating to "https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en", waiting until "load"
+
+2024-12-30 19:37:44 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:37:59 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:38:18 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:38:28 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:38:29 [scrapy.extensions.logstats] INFO: Crawled 65 pages (at 4 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 19:38:39 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:39:07 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:39:07 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:39:09 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:39:29 [scrapy.extensions.logstats] INFO: Crawled 69 pages (at 4 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 19:39:44 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTc14b3609e44f493d9327fd99f1c3e1a5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BMagdalena%2BFlont%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:40:19 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTb64563bf72e44c1da6d9f5eba8286d19?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BKrzysztof%2BStasiak%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:40:19 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUT817d3b704a4e4a9aa3d856fb8a51d539?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BBartosz%2BMichalak%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:40:29 [scrapy.extensions.logstats] INFO: Crawled 72 pages (at 3 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 19:40:39 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:41:09 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:41:24 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en
+2024-12-30 19:41:29 [scrapy.extensions.logstats] INFO: Crawled 75 pages (at 3 pages/min), scraped 42 items (at 0 items/min)
+2024-12-30 19:41:34 [pw_spider] ERROR: Error in parse_scientist, list index out of range https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en

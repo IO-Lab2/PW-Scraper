@@ -3,40 +3,35 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/items.html
 
-from scrapy import Item, Field
-#from scrapy.loader import ItemLoader
-#from itemloaders import processors
-        
-class ScientistItem(Item):
-    first_name = Field()
-    last_name = Field()
-    academic_title = Field()
-    position = Field()
-    email = Field()
-    organization_id = Field()
-    profile_url = Field()
-    identifier  = Field()
-    name = Field()
+import scrapy
 
-class BibliometricsItem(Item):
-    identifier = Field()
-    scientist_id = Field()
-    h_index_wos = Field()
-    h_index_scopus = Field()
-    publication_count = Field()
-    ministerial_score = Field()
 
-class PublicationItem(Item):
-    scientist_id = Field()
-    identifier = Field()
-    journal_type = Field()
-    publication_year = Field()
-    title = Field()
-    journal = Field()
-    #publisher = scrapy.Field()
+class ScientistItem(scrapy.Item):
+    first_name = scrapy.Field()
+    last_name = scrapy.Field()
+    academic_title = scrapy.Field()
+    email = scrapy.Field()
+    profile_url = scrapy.Field()
+    position=scrapy.Field()
+    h_index_scopus = scrapy.Field()
+    h_index_wos = scrapy.Field()
+    publication_count = scrapy.Field()
+    ministerial_score = scrapy.Field()
+    organization= scrapy.Field()
+    research_area = scrapy.Field()
 
-class OrganizationItem(Item):
-    organization_type = Field()
-    name = Field()
-    identifier = Field()
-    parent_id = Field()
+    
+
+class publicationItem(scrapy.Item):
+    title = scrapy.Field()
+    journal = scrapy.Field()
+    publisher = scrapy.Field()
+    publication_date = scrapy.Field()
+    ministerial_score = scrapy.Field()
+    authors = scrapy.Field()
+    vol= scrapy.Field()
+
+class organizationItem(scrapy.Item):
+    university = scrapy.Field()
+    institute= scrapy.Field()
+    cathedras = scrapy.Field() #list of cathedras
