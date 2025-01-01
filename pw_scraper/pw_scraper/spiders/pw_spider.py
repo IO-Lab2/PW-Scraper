@@ -63,17 +63,39 @@ class PwSpider(scrapy.Spider):
         # Process the first page of scientist links
         page = response.meta['playwright_page']
 
-        page_url = 'https://repo.pw.edu.pl/globalResultList.seam?q=&oa=false&r=author&tab=PEOPLE&conversationPropagation=begin&lang=en&qp=openAccess%3Dfalse&p=xyz&pn=1'
-        yield scrapy.Request(url=page_url,
-            callback=self.parse_scientist_links, dont_filter=True,
-            meta=dict(
-                playwright=True,
-                playwright_include_page=True,
-                playwright_page_methods=[PageMethod('wait_for_selector', 'a.authorNameLink', state='visible')],
-                errback=self.errback
-            ))
+        organizations=response.css('div#afftreemain>div#groupingPanel>ul.ui-tree-container>li>ul.ui-treenode-children>li')
+        university=response.css('div#afftreemain>div#groupingPanel>ul.ui-tree-container>li>div.ui-treenode-content div.ui-treenode-label>span>span::text').get()
+        for org in organizations:
+            organization=organizationItem()
+            organization['university']=university
 
-        await page.close()
+            institute=org.css('div.ui-treenode-content div.ui-treenode-label span>span::text').get()
+            organization['institute']=institute
+
+            cathedras = org.css('ul.ui-treenode-children li.ui-treenode-leaf div.ui-treenode-content div.ui-treenode-label span>span::text').getall()
+            if cathedras:
+                organization['cathedras']=cathedras
+            else:
+                organization['cathedras']=[]
+            
+            yield organization
+        
+        
+        total_pages=int(response.css('span.entitiesDataListTotalPages::text').get())
+
+
+        for page_number in range(1+ total_pages +1):
+            page_url = 'https://repo.pw.edu.pl/globalResultList.seam?q=&oa=false&r=author&tab=PEOPLE&conversationPropagation=begin&lang=en&qp=openAccess%3Dfalse&p=xyz&pn=1'
+            yield scrapy.Request(url=page_url,
+                callback=self.parse_scientist_links, dont_filter=True,
+                meta=dict(
+                    playwright=True,
+                    playwright_include_page=True,
+                    playwright_page_methods=[PageMethod('wait_for_selector', 'a.authorNameLink', state='visible')],
+                    errback=self.errback
+                ))
+
+            await page.close()
 
     async def parse_scientist_links(self, response):
         # Scrape scientist profile links and visit their profiles
@@ -119,19 +141,36 @@ class PwSpider(scrapy.Spider):
             # Extract academic title if available
             scientist['academic_title'] = name_title[1] if len(name_title) > 1 else None
                         # Extract email
-            scientist['email'] = personal_data.css('p.authorContactInfoEmailContainer>a::text').get() or None
+            scientist['email'] = personal_data.xpath('//a[contains(@href, "mailto:")]/text()').get() or None
 
             # Profile URL
-            scientist['profile_url'] = response.url
+            scientist['profile_url']= response.url
+            scientist['position']=personal_data.css('p.possitionInfo span::text').get() or None
 
-            # Position
-            scientist['position'] = personal_data.css('p.possitionInfo span::text').get() or None
+            scientist['h_index_scopus']=response.xpath('//li[@class="hIndexItem"][span[contains(text(), "Scopus")]]//a/text()').get() or 0
+            
+            scientist['h_index_wos']=response.xpath('//li[@class="hIndexItem"][span[contains(text(), "WoS")]]//a/text()').get() or 0
+            
+            pub_count=response.xpath('//li[contains(@class, "li-element-wcag")][span[@class="achievementName" and contains(text(), "Publications")]]//a/text()').get()
+            scientist['publication_count']=pub_count or 0
 
-            # H-indexes and publication count
-            scientist['h_index_scopus'] = response.xpath('//li[@class="hIndexItem"][span[contains(text(), "Scopus")]]//a/text()').get() or 0
-            scientist['h_index_wos'] = response.xpath('//li[@class="hIndexItem"][span[contains(text(), "WoS")]]//a/text()').get() or 0
-            pub_count = response.xpath('//li[contains(@class, "li-element-wcag")][span[@class="achievementName" and contains(text(), "Publications")]]//a/text()').get()
-            scientist['publication_count'] = pub_count or 0
+            if response.css('ul.bibliometric-data-list li>span.indicatorName'):
+                #loading spinner ui-outputpanel-loading ui-widget
+
+                await page.wait_for_function(
+                                    """() => {
+                                        const element = document.querySelector('div#j_id_3_1q_1_1_8_6n_a_2');
+                                        return element && element.textContent.trim().length > 0;
+                                    }"""
+                                )
+                ministerial_score= await page.evaluate('document.querySelector("div#j_id_3_1q_1_1_8_6n_a_2")?.textContent.trim()')
+                    
+                if '—' not in ministerial_score:
+                    scientist['ministerial_score']=ministerial_score
+                else:
+                    scientist['ministerial_score']=0
+            else:
+                scientist['ministerial_score']=0
 
             # Organization affiliations
             organization_scientist = personal_data.css('ul.authorAffilList li span a>span::text').getall() or None
