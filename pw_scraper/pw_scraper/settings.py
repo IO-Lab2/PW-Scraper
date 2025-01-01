@@ -1,11 +1,4 @@
-# Scrapy settings for pw_scraper project
-#
-# For simplicity, this file contains only settings considered important or
-# commonly used. You can find more settings consulting the documentation:
-#
-#     https://docs.scrapy.org/en/latest/topics/settings.html
-#     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-#     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+
 
 BOT_NAME = "pw_scraper"
 
@@ -105,7 +98,8 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'pw_scraper.pipelines.SaveToJsonFile': 800,
+    "pw_scraper.pipelines.pw_scraperPipeline": 300,
+    #'pw_scraper.pipelines.SaveToDataBase': 800,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

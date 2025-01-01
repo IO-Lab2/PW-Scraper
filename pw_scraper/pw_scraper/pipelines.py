@@ -1,29 +1,40 @@
 import json
-import os
+from itemadapter import ItemAdapter
 
-class SaveToJsonFile:
+class pw_scraperPipeline:
     def open_spider(self, spider):
-        # Create or clear the JSON file when the spider starts
-        self.file_path = 'scraped_dataa.json'
-        with open(self.file_path, 'w') as file:
-            json.dump([], file)  # Initialize with an empty list
+        # Initialize both JSON files
+        self.organisation_file_path = 'organisation.json'
+        self.links_file_path = 'links.json'
 
-        print(f'SPIDER: {spider.name} STARTED')
+        with open(self.organisation_file_path, 'w') as org_file:
+            json.dump([], org_file)  # Initialize with an empty list
+
+        with open(self.links_file_path, 'w') as links_file:
+            json.dump([], links_file)  # Initialize with an empty list
+
+        spider.logger.info("Initialized organisation.json and links.json")
 
     def close_spider(self, spider):
-        # Finalize actions when the spider closes
-        print(f'SPIDER: {spider.name} FINISHED')
+        spider.logger.info("Spider finished")
 
     def process_item(self, item, spider):
-        # Read the existing JSON data
-        with open(self.file_path, 'r') as file:
+        if "university" in item:  # Organization item
+            file_path = self.organisation_file_path
+        elif "profile_url" in item:  # Scientist link item
+            file_path = self.links_file_path
+        else:
+            self.logger.warning(f"Unknown item type: {item}")
+            return item
+
+        # Append the item to the appropriate file
+        with open(file_path, 'r') as file:
             data = json.load(file)
-        
-        # Append the new item (convert to a dict first)
+
         data.append(dict(item))
-        
-        # Write the updated data back to the file
-        with open(self.file_path, 'w') as file:
+
+        with open(file_path, 'w') as file:
             json.dump(data, file, indent=4)
-        
+
+        self.logger.info(f"Saved item to {file_path}: {item}")
         return item
