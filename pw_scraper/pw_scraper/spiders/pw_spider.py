@@ -84,8 +84,8 @@ class PwSpider(scrapy.Spider):
         total_pages=int(response.css('span.entitiesDataListTotalPages::text').get())
 
 
-        for page_number in range(1+ total_pages +1):
-            page_url = 'https://repo.pw.edu.pl/globalResultList.seam?q=&oa=false&r=author&tab=PEOPLE&conversationPropagation=begin&lang=en&qp=openAccess%3Dfalse&p=xyz&pn=1'
+        for page_number in range(1,total_pages +1):
+            page_url = 'https://repo.pw.edu.pl/globalResultList.seam?q=&oa=false&r=author&tab=PEOPLE&conversationPropagation=begin&lang=en&qp=openAccess%3Dfalse&p=ukr&pn={page_number}'.format(page_number=page_number)
             yield scrapy.Request(url=page_url,
                 callback=self.parse_scientist_links, dont_filter=True,
                 meta=dict(
@@ -129,18 +129,23 @@ class PwSpider(scrapy.Spider):
             full_name = name_title[0] if len(name_title) > 0 else None
 
             if full_name:
-                name_parts = full_name.split()
-                
-                # Assuming the first part is the first name and the last part is the last name
-                scientist['first_name'] = name_parts[0] if len(name_parts) > 0 else None
-                scientist['last_name'] = name_parts[-1] if len(name_parts) > 1 else None
+                # Split full_name into parts using the comma as a separator
+                name_parts = full_name.split(',')
+
+                # Extract first and last name
+                main_name = name_parts[0].strip()
+                name_tokens = main_name.split()
+
+                scientist['first_name'] = name_tokens[0] if len(name_tokens) > 0 else None
+                scientist['last_name'] = name_tokens[-1] if len(name_tokens) > 1 else None
+
+                # Extract academic title if it exists after the comma
+                scientist['academic_title'] = name_parts[1].strip() if len(name_parts) > 1 else None
             else:
+                # Fallback in case of missing full_name
                 scientist['first_name'] = None
                 scientist['last_name'] = None
-
-            # Extract academic title if available
-            scientist['academic_title'] = name_title[1] if len(name_title) > 1 else None
-                        # Extract email
+                scientist['academic_title'] = None
             scientist['email'] = personal_data.xpath('//a[contains(@href, "mailto:")]/text()').get() or None
 
             # Profile URL

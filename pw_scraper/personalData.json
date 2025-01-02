@@ -330,23 +330,5 @@
             "biotechnology (BT)",
             "chemical sciences (CHS)"
         ]
-    },
-    {
-        "first_name": "Aliaksandr",
-        "last_name": "Martsinchyk",
-        "academic_title": null,
-        "email": "01117484@pw.edu.pl",
-        "profile_url": "https://repo.pw.edu.pl/info/author/WUTd3dec995be39439f93ef94e66cce12d5?r=author&tab=&title=Person%2Bprofile%2B%25E2%2580%2593%2BAliaksandr%2BMartsinchyk%2B%25E2%2580%2593%2BWarsaw%2BUniversity%2Bof%2BTechnology&lang=en",
-        "position": null,
-        "h_index_scopus": 0,
-        "h_index_wos": 0,
-        "publication_count": 0,
-        "ministerial_score": 0,
-        "organization": [
-            "Doctoral School"
-        ],
-        "research_area": [
-            "environmental engineering, mining and energy (EEME)"
-        ]
     }
 ]
