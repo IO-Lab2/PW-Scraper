@@ -99,7 +99,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "pw_scraper.pipelines.CleanItemsPipeline": 100,
-    "pw_scraper.pipelines.pw_scraperPipeline": 300,
+    # "pw_scraper.pipelines.pw_scraperPipeline": 300,
     #'pw_scraper.pipelines.DataBasePipeline': 800,
 }
 

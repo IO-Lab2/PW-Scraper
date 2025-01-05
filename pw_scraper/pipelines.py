@@ -103,20 +103,78 @@ class DatabasePipeline:
         self.connection = psycopg.connect(host=self.hostname, user=self.scraper_username, 
                                           password=self.scraper_password, dbname=self.database, port=self.port)
         self.cur = self.connection.cursor()
-        logging.info("Connected to database")
+        logging.info(f'Spider: {spider.name} connected to database')
 
     def process_item(self, item, spider):
         # Insert the item into the appropriate table
         adapter = ItemAdapter(item)
 
         if isinstance(item, ScientistItem):
-            pass
+            scientist_fields = tuple(ItemAdapter(item).values())
+            self.update_scientist(adapter, scientist_fields)
+            return item
         elif isinstance(item, PublicationItem):
             pass
         elif isinstance(item, OrganizationItem):
             pass
 
     def close_spider(self, spider):
+        
         self.cur.close()
         self.connection.close()
-        logging.info("Database connection closed")
+        logging.info(f'Spider: {spider.name}Database connection closed')
+    
+    def update_scientist(self, adapter, scientist_fields):
+        email = adapter.get('email')
+        
+
+        search_query = """
+            SELECT id, first_name, last_name, academic_title, email, profile_url, position FROM scientists WHERE email = %s;
+        """
+        self.cur.execute(search_query,(email,))
+        db_check = self.cur.fetchone()
+
+        if db_check:
+            if db_check[1:] != scientist_fields[:6]:
+                update_query = """
+                                UPDATE scientists
+                                SET
+                                    first_name = %s,
+                                    last_name = %s,
+                                    academic_title = %s,
+                                    email = %s,
+                                    profile_url = %s,
+                                    updated_at = CURRENT_TIMESTAMP,
+                                    position=%s
+                                WHERE email = %s;
+                                """
+                self.cur.execute(update_query, (email,))
+                
+                logging.info(f"{adapter.get('first_name')} {adapter.get('last_name')} updated in the database")
+
+            return
+        else:
+            add_query = """ 
+                    INSERT INTO
+                    scientists (
+                        first_name,
+                        last_name,
+                        academic_title,
+                        email,
+                        profile_url,
+                        position
+                    )
+                    VALUES (
+                            %s,
+                            %s,
+                            %s,
+                            %s,
+                            %s,
+                            %s
+                            )"""
+            self.cursor.execute(add_query ,scientist_fields[:6])
+
+            logging.info(f"{adapter.get('first_name')} {adapter.get('last_name')} added to the database")
+            
+
+

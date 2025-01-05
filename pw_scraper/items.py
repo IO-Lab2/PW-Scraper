@@ -20,8 +20,6 @@ class ScientistItem(scrapy.Item):
     organization= scrapy.Field()
     research_area = scrapy.Field()
 
-    
-
 class PublicationItem(scrapy.Item):
     title = scrapy.Field()
     journal = scrapy.Field()
