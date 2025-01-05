@@ -1,3 +1,6 @@
+scrapy
+scrapy-playwright
+playwright
 gitdb==4.0.11
 GitPython==3.1.41
 psycopg2==2.9.10
