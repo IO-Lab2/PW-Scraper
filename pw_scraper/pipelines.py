@@ -110,12 +110,25 @@ class DatabasePipeline:
         logging.info(f'Spider: {spider.name} connected to database')
 
     def process_item(self, item, spider):
-        # Insert the item into the appropriate table
+        # Update or insert the item into the appropriate table
         adapter = ItemAdapter(item)
 
         if isinstance(item, ScientistItem):
             scientist_fields = tuple(ItemAdapter(item).values())
-            self.update_scientist(adapter, scientist_fields)
+
+            # scientist table
+            scientist_id = self.update_scientist(adapter, scientist_fields)
+
+            # bibliometrics table
+            self.update_scientist_bibliometrics(
+                adapter, scientist_id, scientist_fields[6:10])
+
+            # scientist_organization table
+            self.update_scientist_relationship(scientist_id, adapter)
+
+            # scientist_research_areas table
+            self.update_research_area(scientist_id)
+
             return item
 
         elif isinstance(item, PublicationItem):
@@ -142,16 +155,18 @@ class DatabasePipeline:
             university_id = self.update_organization(adapter.get('university'),
                                                      'university')
             self.update_organization_relationship(None, university_id)
-            
+
             institute_id = self.update_organization(adapter.get('institute'),
-                                                     'institute')
+                                                    'institute')
             self.update_organization_relationship(university_id, institute_id)
 
             cathedras = adapter.get('cathedras')
             if cathedras:
                 for cathedra in cathedras:
-                    cathedra_id = self.update_organization(cathedra, 'cathedra')
-                    self.update_organization_relationship(institute_id, cathedra_id)
+                    cathedra_id = self.update_organization(
+                        cathedra, 'cathedra')
+                    self.update_organization_relationship(
+                        institute_id, cathedra_id)
                     self.update_organization_relationship(cathedra_id, None)
             else:
                 self.update_organization_relationship(institute_id, None)
@@ -273,10 +288,10 @@ class DatabasePipeline:
         select_query = "SELECT id FROM organizations WHERE name like %s AND type=%s;"
         self.cur.execute(select_query, (name, organization_type))
         result = self.cur.fetchone()
-        
+
         if result:
             return result[0]
-        
+
         else:
             insert_query = """
                             INSERT INTO 
@@ -288,14 +303,17 @@ class DatabasePipeline:
 
     def update_organization_relationship(self, parent_id, child_id):
         if parent_id is None:
-            self.cursor.execute("SELECT id FROM organizations_relationships WHERE parent_id IS NULL AND child_id=%s;", (child_id,))
-        
+            self.cursor.execute(
+                "SELECT id FROM organizations_relationships WHERE parent_id IS NULL AND child_id=%s;", (child_id,))
+
         elif child_id is None:
-            self.cursor.execute("SELECT id FROM organizations_relationships WHERE parent_id=%s AND child_id IS NULL;", (parent_id,))
-        
+            self.cursor.execute(
+                "SELECT id FROM organizations_relationships WHERE parent_id=%s AND child_id IS NULL;", (parent_id,))
+
         else:
-            self.cursor.execute("SELECT id FROM organizations_relationships WHERE parent_id=%s AND child_id=%s;", (parent_id, child_id))
-        
+            self.cursor.execute(
+                "SELECT id FROM organizations_relationships WHERE parent_id=%s AND child_id=%s;", (parent_id, child_id))
+
         if self.cursor.fetchone() is None:
             insert_query = """
                             INSERT INTO 
@@ -303,3 +321,103 @@ class DatabasePipeline:
                             (parent_id, child_id) 
                             VALUES (%s, %s) RETURNING id;"""
             self.cur.execute(insert_query, (parent_id, child_id))
+
+    def update_scientist_bibliometrics(self, scientist_id, scientist_fields):
+        select_query = """
+                    SELECT
+                        h_index_wos,
+                        h_index_scopus,
+                        publication_count,
+                        ministerial_score
+                    FROM bibliometrics
+                    WHERE scientist_id = %s;
+                    """
+        self.cur.execute(select_query, (scientist_id,))
+
+        bibliometrics_db_check = self.cur.fetchone()
+
+        if bibliometrics_db_check:
+            if bibliometrics_db_check != scientist_fields:
+                update_query = """
+                            UPDATE bibliometrics
+                            SET
+                                h_index_wos = %s,
+                                h_index_scopus = %s,
+                                publication_count = %s,
+                                ministerial_score = %s,
+                                updated_at = CURRENT_TIMESTAMP
+                            WHERE scientist_id = %s;
+                            """
+                self.cur.execute(
+                    update_query, scientist_fields + (scientist_id,))
+
+        else:
+            insert_query = """
+                            INSERT INTO 
+                            bibliometrics 
+                            (h_index_wos, h_index_scopus, publication_count, ministerial_score, scientist_id) 
+                            VALUES (%s, %s, %s, %s, %s) RETURNING id;"""
+            self.cur.execute(insert_query, scientist_fields + (scientist_id,))
+
+    def update_scientist_relationship(self, scientist_id, adapter):
+        organizations = adapter.get('organizations')
+        for key in organizations:
+            select_organization_query = "SELECT id FROM organizations WHERE name like %s;"
+            self.cur.execute(select_organization_query, {organizations[key]})
+            organization_id = self.cur.fetchone()[0]
+
+            select_query = """
+                                SELECT organization_id, so.id 
+                                FROM scientist_organization so 
+                                INNER JOIN organizations o ON so.organization_id = o.id
+                                WHERE scientist_id = %s AND type=%s;"""
+            self.cur.execute(select_query, (scientist_id, key))
+            scientist_organization_check = self.cur.fetchone()
+
+            if scientist_organization_check:
+                if scientist_organization_check[0] != organization_id:
+                    update_query = """
+                                UPDATE scientist_organization
+                                SET
+                                    organization_id = %s,
+                                    updated_at = CURRENT_TIMESTAMP
+                                WHERE id = %s;
+                                """
+                    self.cur.execute(
+                        update_query, (organization_id, scientist_organization_check[1]))
+
+            else:
+                insert_query = """
+                                INSERT INTO 
+                                scientist_organization 
+                                (scientist_id, organization_id) 
+                                VALUES (%s, %s);
+                                """
+                self.cur.execute(insert_query, (scientist_id, organization_id))
+
+    def update_research_area(self, adapter, scientist_id):
+        research_area_ids = []
+        research_areas = adapter.get('research_area')
+
+        for research_area in research_areas:
+            self.cur.execute(
+                f"SELECT id FROM research_areas WHERE name like '{research_area}';")
+            in_db = self.cur.fetchone()
+
+            if in_db:
+                research_area_ids.append(in_db[0])
+
+            else:
+                insert_query = "INSERT INTO research_areas (name) VALUES (%s) RETURNING id;"
+                self.cur.execute(insert_query, (research_area,))
+                research_area_ids.append(self.cur.fetchone()[0])
+
+        select_query = "SELECT research_area_id FROM scientists_research_areas WHERE scientist_id = %s;"
+        self.cur.execute(select_query, (scientist_id,))
+
+        ra_result = [row[0] for row in self.cur.fetchall()]
+
+        for ra_id in research_area_ids:
+            if ra_id not in ra_result:
+                insert_query = "INSERT INTO scientists_research_areas (scientist_id, research_area_id) VALUES (%s, %s);"
+                self.cur.execute(insert_query, (scientist_id, ra_id))
