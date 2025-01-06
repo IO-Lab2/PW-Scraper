@@ -7,6 +7,7 @@ import os
 from pw_scraper.items import ScientistItem, PublicationItem, OrganizationItem
 import re
 
+
 class CleanItemsPipeline:
     # Clean items before saving to the database
     def process_item(self, item, spider):
@@ -24,16 +25,17 @@ class CleanItemsPipeline:
 
         logging.info(f"Cleaned item: {adapter.get('')}")
         return item
-    
+
     def clean_fields(self, adapter):
         # Clean the fields of ScientistItem
-            for field_name in adapter.field_names():
-                field_value = adapter.get(field_name)
+        for field_name in adapter.field_names():
+            field_value = adapter.get(field_name)
 
-                if isinstance(field_value, str):
-                    field_value = field_value.strip()
-                    field_value = re.sub(r'\s+', ' ', field_value) # Replace multiple spaces with a single space
-                    adapter[field_name] = field_value
+            if isinstance(field_value, str):
+                field_value = field_value.strip()
+                # Replace multiple spaces with a single space
+                field_value = re.sub(r'\s+', ' ', field_value)
+                adapter[field_name] = field_value
 
 
 class pw_scraperPipeline:
@@ -74,7 +76,8 @@ class pw_scraperPipeline:
     def initialize_json_file(self, file_path):
         """Initialize an empty JSON file with an empty list."""
         with open(file_path, 'w', encoding='utf-8') as file:
-            json.dump([], file, ensure_ascii=False)  # Initialize with an empty list
+            # Initialize with an empty list
+            json.dump([], file, ensure_ascii=False)
 
     def append_to_json_file(self, file_path, item):
         """Append an item to an existing JSON file."""
@@ -89,6 +92,7 @@ class pw_scraperPipeline:
         with open(file_path, 'w', encoding='utf-8') as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
+
 class DatabasePipeline:
     def open_spider(self, spider):
         dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
@@ -100,7 +104,7 @@ class DatabasePipeline:
         self.port = os.getenv("PGPORT")
         self.database = os.getenv("PGDATABASE")
 
-        self.connection = psycopg.connect(host=self.hostname, user=self.scraper_username, 
+        self.connection = psycopg.connect(host=self.hostname, user=self.scraper_username,
                                           password=self.scraper_password, dbname=self.database, port=self.port)
         self.cur = self.connection.cursor()
         logging.info(f'Spider: {spider.name} connected to database')
@@ -113,29 +117,47 @@ class DatabasePipeline:
             scientist_fields = tuple(ItemAdapter(item).values())
             self.update_scientist(adapter, scientist_fields)
             return item
+
         elif isinstance(item, PublicationItem):
-            pass
+            authors = adapter.get('authors')
+            if authors:
+                for author_id in authors:
+                    select_query = "SELECT id FROM scientists WHERE profile_url like %s;"
+                    self.cur.execute(select_query, ('%' + author_id + '%',))
+                    result = self.cur.fetchone()
+
+                    if result:
+                        scientist_id = result[0]
+                        publication_id = self.update_publication(adapter['title'],
+                                                                 adapter['publisher'],
+                                                                 adapter['publication_date'],
+                                                                 adapter['journal'],
+                                                                 adapter['ministerial_score'])
+                        self.update_author_publications(
+                            scientist_id, publication_id)
+                        logging.info(
+                            f"Publication {adapter.get['title']} added to the scientist with id {author_id}")
+
         elif isinstance(item, OrganizationItem):
             pass
 
     def close_spider(self, spider):
-        
+
         self.cur.close()
         self.connection.close()
         logging.info(f'Spider: {spider.name}Database connection closed')
-    
+
     def update_scientist(self, adapter, scientist_fields):
         email = adapter.get('email')
-        
 
         search_query = """
             SELECT id, first_name, last_name, academic_title, email, profile_url, position FROM scientists WHERE email = %s;
         """
-        self.cur.execute(search_query,(email,))
-        db_check = self.cur.fetchone()
+        self.cur.execute(search_query, (email,))
+        scientist_db_check = self.cur.fetchone()
 
-        if db_check:
-            if db_check[1:] != scientist_fields[:6]:
+        if scientist_db_check:
+            if scientist_db_check[1:] != scientist_fields[:6]:
                 update_query = """
                                 UPDATE scientists
                                 SET
@@ -149,10 +171,11 @@ class DatabasePipeline:
                                 WHERE email = %s;
                                 """
                 self.cur.execute(update_query, (email,))
-                
-                logging.info(f"{adapter.get('first_name')} {adapter.get('last_name')} updated in the database")
 
-            return
+                logging.info(
+                    f"{adapter.get('first_name')} {adapter.get('last_name')} updated in the database")
+
+            return scientist_db_check[0]
         else:
             add_query = """ 
                     INSERT INTO
@@ -172,9 +195,58 @@ class DatabasePipeline:
                             %s,
                             %s
                             )"""
-            self.cursor.execute(add_query ,scientist_fields[:6])
+            self.cur.execute(add_query, scientist_fields[:6])
+            logging.info(
+                f"{adapter.get('first_name')} {adapter.get('last_name')} added to the database")
+            return self.cur.fetchone()[0]
 
-            logging.info(f"{adapter.get('first_name')} {adapter.get('last_name')} added to the database")
-            
+    def update_publication(self, title, publisher, publication_date, journal, ministerial_score):
+        select_query = "SELECT id, journal, ministerial_score FROM publications WHERE title = %s AND (publication_date = %s OR publication_date IS NULL);"
+        self.cur.execute(select_query, (title, publication_date))
 
+        result = self.cur.fetchone()
+        if result:
 
+            if result[1:3] != (journal, ministerial_score,):
+                update_query = """
+                                UPDATE publications
+                                SET
+                                    journal = %s,
+                                    ministerial_score = %s,
+                                    updated_at = CURRENT_TIMESTAMP
+                                WHERE id = %s;
+                                """
+                self.cur.execute(
+                    update_query, (journal, ministerial_score, result[0]))
+
+            return result[0]
+
+        else:
+            insert_query = """
+                            INSERT INTO 
+                            publications 
+                            (title, publisher, publication_date, journal_impact_factor, journal, ministerial_score) 
+                            VALUES (%s, %s, %s, 0, %s, %s) RETURNING id;"""
+            self.cur.execute(insert_query, (title, publisher,
+                             publication_date, journal, ministerial_score))
+            return self.cur.fetchone()[0]
+
+    def update_author_publications(self, scientist_id, publication_id):
+        select_query = """
+                    SELECT scientist_id 
+                    FROM scientists_publications
+                    WHERE scientist_id=%s AND publication_id=%s;"""
+        self.cur.execute(select_query, (scientist_id, publication_id))
+        result = self.cur.fetchone()
+
+        if not result:
+            insert_query = """
+                            INSERT INTO 
+                            scientists_publications 
+                            (scientist_id, publication_id) 
+                            VALUES (%s, %s) RETURNING id;"""
+            self.cur.execute(insert_query, (scientist_id, publication_id))
+            return self.cur.fetchone()[0]
+
+        else:
+            return result[0]
