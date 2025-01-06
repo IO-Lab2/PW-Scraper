@@ -139,7 +139,25 @@ class DatabasePipeline:
                             f"Publication {adapter.get['title']} added to the scientist with id {author_id}")
 
         elif isinstance(item, OrganizationItem):
-            pass
+            university_id = self.update_organization(adapter.get('university'),
+                                                     'university')
+            self.update_organization_relationship(None, university_id)
+            
+            institute_id = self.update_organization(adapter.get('institute'),
+                                                     'institute')
+            self.update_organization_relationship(university_id, institute_id)
+
+            cathedras = adapter.get('cathedras')
+            if cathedras:
+                for cathedra in cathedras:
+                    cathedra_id = self.update_organization(cathedra, 'cathedra')
+                    self.update_organization_relationship(institute_id, cathedra_id)
+                    self.update_organization_relationship(cathedra_id, None)
+            else:
+                self.update_organization_relationship(institute_id, None)
+
+        self.connection.commit()
+        return item
 
     def close_spider(self, spider):
 
@@ -250,3 +268,38 @@ class DatabasePipeline:
 
         else:
             return result[0]
+
+    def update_organization(self, name, organization_type):
+        select_query = "SELECT id FROM organizations WHERE name like %s AND type=%s;"
+        self.cur.execute(select_query, (name, organization_type))
+        result = self.cur.fetchone()
+        
+        if result:
+            return result[0]
+        
+        else:
+            insert_query = """
+                            INSERT INTO 
+                            organizations 
+                            (name, type) 
+                            VALUES (%s, %s) RETURNING id;"""
+            self.cur.execute(insert_query, (name, organization_type))
+            return self.cur.fetchone()[0]
+
+    def update_organization_relationship(self, parent_id, child_id):
+        if parent_id is None:
+            self.cursor.execute("SELECT id FROM organizations_relationships WHERE parent_id IS NULL AND child_id=%s;", (child_id,))
+        
+        elif child_id is None:
+            self.cursor.execute("SELECT id FROM organizations_relationships WHERE parent_id=%s AND child_id IS NULL;", (parent_id,))
+        
+        else:
+            self.cursor.execute("SELECT id FROM organizations_relationships WHERE parent_id=%s AND child_id=%s;", (parent_id, child_id))
+        
+        if self.cursor.fetchone() is None:
+            insert_query = """
+                            INSERT INTO 
+                            organizations_relationships 
+                            (parent_id, child_id) 
+                            VALUES (%s, %s) RETURNING id;"""
+            self.cur.execute(insert_query, (parent_id, child_id))
