@@ -16,7 +16,32 @@
     },
     {
         "university": "Warsaw University of Technology",
-        "institute": "Faculty of Automotive and Construction Machinery Engineering",
+        "institute": "Faculty of Civil Engineering, Mechanics and Petrochemistry",
+        "cathedras": []
+    },
+    {
+        "university": "Warsaw University of Technology",
+        "institute": "Faculty of Chemistry",
+        "cathedras": []
+    },
+    {
+        "university": "Warsaw University of Technology",
+        "institute": "Faculty of Electronics and Information Technology",
+        "cathedras": []
+    },
+    {
+        "university": "Warsaw University of Technology",
+        "institute": "Faculty of Electrical Engineering",
+        "cathedras": []
+    },
+    {
+        "university": "Warsaw University of Technology",
+        "institute": "Faculty of Physics",
+        "cathedras": []
+    },
+    {
+        "university": "Warsaw University of Technology",
+        "institute": "Faculty of Geodesy and Cartography",
         "cathedras": []
     },
     {
@@ -31,37 +56,7 @@
     },
     {
         "university": "Warsaw University of Technology",
-        "institute": "Faculty of Chemistry",
-        "cathedras": []
-    },
-    {
-        "university": "Warsaw University of Technology",
         "institute": "Faculty of Civil Engineering",
-        "cathedras": []
-    },
-    {
-        "university": "Warsaw University of Technology",
-        "institute": "Faculty of Civil Engineering, Mechanics and Petrochemistry",
-        "cathedras": []
-    },
-    {
-        "university": "Warsaw University of Technology",
-        "institute": "Faculty of Electrical Engineering",
-        "cathedras": []
-    },
-    {
-        "university": "Warsaw University of Technology",
-        "institute": "Faculty of Electronics and Information Technology",
-        "cathedras": []
-    },
-    {
-        "university": "Warsaw University of Technology",
-        "institute": "Faculty of Geodesy and Cartography",
-        "cathedras": []
-    },
-    {
-        "university": "Warsaw University of Technology",
-        "institute": "Faculty of Management",
         "cathedras": []
     },
     {
@@ -76,6 +71,11 @@
     },
     {
         "university": "Warsaw University of Technology",
+        "institute": "Faculty of Power and Aeronautical Engineering",
+        "cathedras": []
+    },
+    {
+        "university": "Warsaw University of Technology",
         "institute": "Faculty of Mechanical and Industrial Engineering",
         "cathedras": []
     },
@@ -86,12 +86,7 @@
     },
     {
         "university": "Warsaw University of Technology",
-        "institute": "Faculty of Physics",
-        "cathedras": []
-    },
-    {
-        "university": "Warsaw University of Technology",
-        "institute": "Faculty of Power and Aeronautical Engineering",
+        "institute": "Faculty of Automotive and Construction Machinery Engineering",
         "cathedras": []
     },
     {
@@ -101,32 +96,12 @@
     },
     {
         "university": "Warsaw University of Technology",
-        "institute": "Business School",
+        "institute": "Faculty of Management",
         "cathedras": []
     },
     {
         "university": "Warsaw University of Technology",
-        "institute": "Centre for Development Projects",
-        "cathedras": []
-    },
-    {
-        "university": "Warsaw University of Technology",
-        "institute": "Centre for International Cooperation",
-        "cathedras": []
-    },
-    {
-        "university": "Warsaw University of Technology",
-        "institute": "Distance Learning Center",
-        "cathedras": []
-    },
-    {
-        "university": "Warsaw University of Technology",
-        "institute": "Doctoral School",
-        "cathedras": []
-    },
-    {
-        "university": "Warsaw University of Technology",
-        "institute": "Innovations Center",
+        "institute": "WUT Central Administration",
         "cathedras": []
     },
     {
@@ -146,17 +121,27 @@
     },
     {
         "university": "Warsaw University of Technology",
+        "institute": "WUT Information Technology Centre",
+        "cathedras": []
+    },
+    {
+        "university": "Warsaw University of Technology",
+        "institute": "Innovations Center",
+        "cathedras": []
+    },
+    {
+        "university": "Warsaw University of Technology",
         "institute": "Project Support Centre",
         "cathedras": []
     },
     {
         "university": "Warsaw University of Technology",
-        "institute": "Scientific Councils",
+        "institute": "Centre for Development Projects",
         "cathedras": []
     },
     {
         "university": "Warsaw University of Technology",
-        "institute": "Strategic Analysis Department",
+        "institute": "Centre for International Cooperation",
         "cathedras": []
     },
     {
@@ -171,6 +156,21 @@
     },
     {
         "university": "Warsaw University of Technology",
+        "institute": "Strategic Analysis Department",
+        "cathedras": []
+    },
+    {
+        "university": "Warsaw University of Technology",
+        "institute": "Distance Learning Center",
+        "cathedras": []
+    },
+    {
+        "university": "Warsaw University of Technology",
+        "institute": "Scientific Councils",
+        "cathedras": []
+    },
+    {
+        "university": "Warsaw University of Technology",
         "institute": "The Foreign Language Centre",
         "cathedras": []
     },
@@ -181,12 +181,12 @@
     },
     {
         "university": "Warsaw University of Technology",
-        "institute": "The University Research Center of Aviation and Cosmonautics",
+        "institute": "Business School",
         "cathedras": []
     },
     {
         "university": "Warsaw University of Technology",
-        "institute": "University Defense and Security Research Center",
+        "institute": "Doctoral School",
         "cathedras": []
     },
     {
@@ -196,12 +196,12 @@
     },
     {
         "university": "Warsaw University of Technology",
-        "institute": "WUT Central Administration",
+        "institute": "The University Research Center of Aviation and Cosmonautics",
         "cathedras": []
     },
     {
         "university": "Warsaw University of Technology",
-        "institute": "WUT Information Technology Centre",
+        "institute": "University Defense and Security Research Center",
         "cathedras": []
     },
     {

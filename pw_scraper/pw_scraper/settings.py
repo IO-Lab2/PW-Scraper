@@ -1,4 +1,11 @@
-
+# Scrapy settings for pw_scraper project
+#
+# For simplicity, this file contains only settings considered important or
+# commonly used. You can find more settings consulting the documentation:
+#
+#     https://docs.scrapy.org/en/latest/topics/settings.html
+#     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
+#     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 BOT_NAME = "pw_scraper"
 
@@ -10,7 +17,7 @@ NEWSPIDER_MODULE = "pw_scraper.spiders"
 #PLAYWRIGHT_PROCESS_REQUEST_HEADERS=None
 #PLAYWRIGHT_MAX_CONTEXTS = 20
 PLAYWRIGHT_LAUNCH_OPTIONS={
-    "headless": True, 
+    "headless": False, 
     "args": [
         "--disable-gpu",
         "--disable-dev-shm-usage",
@@ -49,8 +56,18 @@ LOG_LEVEL = 'INFO'  # Zapisuj tylko błędy, lub użyj 'DEBUG'/'INFO' dla bardzi
 LOG_FILE = "scrapy_errors.log"  # Plik, do którego będą zapisywane logi
 
 
+
+
+
+PLAYWRIGHT_CONTEXTS={
+    "pages":{},
+    "people":{},
+    "publication":{}
+}
+
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS =32
+#CONCURRENT_REQUESTS =32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -98,22 +115,22 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    "pw_scraper.pipelines.pw_scraperPipeline": 300,
-    #'pw_scraper.pipelines.SaveToDataBase': 800,
+    "pw_scraper.pipelines.pw_scraperPipeline": 700,
+    #'pw_scraper.pipelines.SaveToJsonFile': 800,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
 AUTOTHROTTLE_ENABLED = True
 # The initial download delay
-#AUTOTHROTTLE_START_DELAY = 5
+AUTOTHROTTLE_START_DELAY = 0.2
 # The maximum download delay to be set in case of high latencies
-#AUTOTHROTTLE_MAX_DELAY = 60
+AUTOTHROTTLE_MAX_DELAY = 60
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
-#AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
+AUTOTHROTTLE_TARGET_CONCURRENCY = 32
 # Enable showing throttling stats for every response received:
-#AUTOTHROTTLE_DEBUG = False
+AUTOTHROTTLE_DEBUG = False
 
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
