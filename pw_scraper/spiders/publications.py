@@ -4,13 +4,15 @@ import asyncio
 from scrapy_playwright.page import PageMethod
 from pw_scraper.items import PublicationItem
 
-#logging.getLogger('asyncio').setLevel(logging.CRITICAL)
+# logging.getLogger('asyncio').setLevel(logging.CRITICAL)
+
 
 def should_abort_request(request):
     return (
         request.resource_type in ["image", "stylesheet", "font", "media"]
         or ".jpg" in request.url
     )
+
 
 class PublicationsSpider(scrapy.Spider):
     name = "publications"
@@ -19,50 +21,58 @@ class PublicationsSpider(scrapy.Spider):
     custom_settings = {
         'PLAYWRIGHT_ABORT_REQUEST': should_abort_request,
         'PLAYWRIGHT_MAX_PAGES_PER_CONTEXT': 5,
-        'CONCURRENT_REQUESTS':10,
+        'CONCURRENT_REQUESTS': 10,
     }
 
-    pw_url='https://repo.pw.edu.pl'
+    pw_url = 'https://repo.pw.edu.pl'
 
     def start_requests(self):
-        
-        yield scrapy.Request(url=self.pw_url, 
+
+        yield scrapy.Request(url=self.pw_url,
             callback=self.parse_pages,
                 meta=dict(playwright=True, playwright_include_page=True, playwright_context="pages",))
-        
+
     async def parse_pages(self, response):
-        page=response.meta['playwright_page']
+        page = response.meta['playwright_page']
         await page.goto('https://repo.pw.edu.pl/globalResultList.seam?r=publication&tab=PUBLICATION&lang=en')
         await page.wait_for_selector('span.entitiesDataListTotalPages', state='visible')
-        #total_pages=int(response.css('span.entitiesDataListTotalPages::text').get().replace(',', ''))
+        # total_pages=int(response.css('span.entitiesDataListTotalPages::text').get().replace(',', ''))
         total_pages = await page.evaluate("parseInt(document.querySelector('span.entitiesDataListTotalPages').innerText.replace(',', ''))")
-        
-        #Generate requests for each page based on the total number of pages
-        for page_number in range(1, total_pages+1):
+
+        # Generate requests for each page based on the total number of pages
+        for page_number in range(1, 2):
             page_url = f'https://repo.pw.edu.pl/globalResultList.seam?r=publication&tab=PUBLICATION&lang=en&p=bst&pn={page_number}'
 
             yield scrapy.Request(url=page_url,
                 callback=self.parse_publications_links,
                 meta=dict(
-                    playwright=True, 
+                    playwright=True,
                     playwright_include_page=True,
                     playwright_context="pages",
                     errback=self.errback
                 ))
-            #await asyncio.sleep(1)
+            # await asyncio.sleep(1)
 
         await page.close()
 
     async def parse_publications_links(self, response):
         try:
             page = response.meta['playwright_page']
-            await page.wait_for_selector('div.entity-row-heading-wrapper h5 a', state='visible')
-            publications_urls = await page.evaluate('''() => {
+            await page.wait_for_selector('//*[@id="entitiesT:0:j_id_3g_2_c_2_9a_2_2_1"]', state='visible')
+            elements = await page.evaluate('''() => {
                 return Array.from(document.querySelectorAll('div.entity-row-heading-wrapper h5 a')).map(el => el.href);
-                                                    }''')
+            }''')
             
-            for pub in publications_urls:
-                yield scrapy.Request(pub, callback=self.parse_publication,)
+            for element in elements:
+                yield scrapy.Request(url=element,
+                    callback=self.parse_publication,
+                    meta=dict(
+                        playwright=True,
+                        playwright_include_page=True,
+                        playwright_context="pages",
+                        errback=self.errback
+                    ))
+                
             await page.close()
 
         except Exception as e:
@@ -76,7 +86,8 @@ class PublicationsSpider(scrapy.Spider):
                         errback=self.errback
                     ))
     
-    def parse_publication(self, response):
+    async def parse_publication(self, response):
+        page = response.meta['playwright_page']
         
         try:
             authors_selector = response.css('div.authorListElement>a::attr(href)').getall() or None
@@ -138,6 +149,8 @@ class PublicationsSpider(scrapy.Spider):
         finally:
             if publication['authors'] and publication['title']:
                 yield publication
+        
+        await page.close()
         
             
     async def errback(self, failure):
