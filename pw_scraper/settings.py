@@ -10,7 +10,7 @@ NEWSPIDER_MODULE = "pw_scraper.spiders"
 #PLAYWRIGHT_PROCESS_REQUEST_HEADERS=None
 #PLAYWRIGHT_MAX_CONTEXTS = 20
 PLAYWRIGHT_LAUNCH_OPTIONS={
-    "headless": False, 
+    "headless": True, 
     "args": [
         "--disable-gpu",
         "--disable-dev-shm-usage",
@@ -50,7 +50,7 @@ LOG_FILE = "scrapy_errors.log"  # Plik, do którego będą zapisywane logi
 
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS =32
+CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -100,7 +100,7 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
     "pw_scraper.pipelines.CleanItemsPipeline": 100,
     # "pw_scraper.pipelines.pw_scraperPipeline": 300,
-    #'pw_scraper.pipelines.DataBasePipeline': 800,
+    'pw_scraper.pipelines.DatabasePipeline': 800,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

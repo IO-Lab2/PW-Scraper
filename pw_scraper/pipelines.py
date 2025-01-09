@@ -23,7 +23,7 @@ class CleanItemsPipeline:
             # Seemingly no fields of item need to be cleaned
             pass
 
-        logging.info(f"Cleaned item: {adapter.get('')}")
+        logging.info(f"Cleaned item: {adapter.get('title')}")
         return item
 
     def clean_fields(self, adapter):
@@ -103,10 +103,14 @@ class DatabasePipeline:
         self.scraper_password = os.getenv("PGPASSWORDSCRAPER")
         self.port = os.getenv("PGPORT")
         self.database = os.getenv("PGDATABASE")
+        
+        try: 
+            self.connection = psycopg.connect(host=self.hostname, user=self.scraper_username,
+                                            password=self.scraper_password, dbname=self.database, port=self.port)
+            self.cur = self.connection.cursor()
+        except Exception as e:
+            logging.error(f"Error connecting to the database: {e}")
 
-        self.connection = psycopg.connect(host=self.hostname, user=self.scraper_username,
-                                          password=self.scraper_password, dbname=self.database, port=self.port)
-        self.cur = self.connection.cursor()
         logging.info(f'Spider: {spider.name} connected to database')
 
     def process_item(self, item, spider):
@@ -132,24 +136,28 @@ class DatabasePipeline:
             return item
 
         elif isinstance(item, PublicationItem):
+            logging.info(f"Database processing item: {adapter.get('title')}")
             authors = adapter.get('authors')
+            adapter['publication_date'] += '-01-01'
             if authors:
                 for author_id in authors:
-                    select_query = "SELECT id FROM scientists WHERE profile_url like %s;"
-                    self.cur.execute(select_query, ('%' + author_id + '%',))
-                    result = self.cur.fetchone()
-
-                    if result:
-                        scientist_id = result[0]
-                        publication_id = self.update_publication(adapter['title'],
+                    publication_id = self.update_publication(adapter['title'],
                                                                  adapter['publisher'],
                                                                  adapter['publication_date'],
                                                                  adapter['journal'],
                                                                  adapter['ministerial_score'])
+                    
+                    select_query = "SELECT id FROM scientists WHERE profile_url like %s;"
+                    try:
+                        self.cur.execute(select_query, ('%' + author_id + '%',))
+                        result = self.cur.fetchone()
+                    except Exception as e:
+                        logging.error(f"Error executing query: {e}")
+
+                    if result:
+                        scientist_id = result[0]
                         self.update_author_publications(
                             scientist_id, publication_id)
-                        logging.info(
-                            f"Publication {adapter.get['title']} added to the scientist with id {author_id}")
 
         elif isinstance(item, OrganizationItem):
             university_id = self.update_organization(adapter.get('university'),
@@ -234,12 +242,13 @@ class DatabasePipeline:
             return self.cur.fetchone()[0]
 
     def update_publication(self, title, publisher, publication_date, journal, ministerial_score):
-        select_query = "SELECT id, journal, ministerial_score FROM publications WHERE title = %s AND (publication_date = %s OR publication_date IS NULL);"
-        self.cur.execute(select_query, (title, publication_date))
-
-        result = self.cur.fetchone()
+        try:
+            select_query = "SELECT id, journal, ministerial_score FROM publications WHERE title = %s AND (publication_date = %s OR publication_date IS NULL);"
+            self.cur.execute(select_query, (title, publication_date))
+            result = self.cur.fetchone()
+        except Exception as e:
+            logging.error(f"Error select query inside update_publications query: {e}")
         if result:
-
             if result[1:3] != (journal, ministerial_score,):
                 update_query = """
                                 UPDATE publications
@@ -249,9 +258,13 @@ class DatabasePipeline:
                                     updated_at = CURRENT_TIMESTAMP
                                 WHERE id = %s;
                                 """
-                self.cur.execute(
-                    update_query, (journal, ministerial_score, result[0]))
+                try:
+                    self.cur.execute(
+                        update_query, (journal, ministerial_score, result[0]))
+                except Exception as e:
+                    logging.error(f"Error update inside update_publications query: {e}")
 
+            logging.info(f"Publication in the database updated")
             return result[0]
 
         else:
@@ -260,8 +273,13 @@ class DatabasePipeline:
                             publications 
                             (title, publisher, publication_date, journal_impact_factor, journal, ministerial_score) 
                             VALUES (%s, %s, %s, 0, %s, %s) RETURNING id;"""
-            self.cur.execute(insert_query, (title, publisher,
-                             publication_date, journal, ministerial_score))
+            try:
+                self.cur.execute(insert_query, (title, publisher,
+                                publication_date, journal, ministerial_score))
+            except Exception as e:
+                logging.error(f"Error insert query: {e}")
+
+            logging.info(f"Publication added to the database")
             return self.cur.fetchone()[0]
 
     def update_author_publications(self, scientist_id, publication_id):
@@ -269,8 +287,11 @@ class DatabasePipeline:
                     SELECT scientist_id 
                     FROM scientists_publications
                     WHERE scientist_id=%s AND publication_id=%s;"""
-        self.cur.execute(select_query, (scientist_id, publication_id))
-        result = self.cur.fetchone()
+        try:
+            self.cur.execute(select_query, (scientist_id, publication_id))
+            result = self.cur.fetchone()
+        except Exception as e:
+            logging.error(f"Error select inside update_author_publications query: {e}")
 
         if not result:
             insert_query = """
@@ -278,10 +299,16 @@ class DatabasePipeline:
                             scientists_publications 
                             (scientist_id, publication_id) 
                             VALUES (%s, %s) RETURNING id;"""
-            self.cur.execute(insert_query, (scientist_id, publication_id))
+            try:
+                self.cur.execute(insert_query, (scientist_id, publication_id))
+            except Exception as e:
+                logging.error(f"Error insert inside update_author_publications query: {e}")
+
+            logging.info(f"Scientist-publication relation added to the database")
             return self.cur.fetchone()[0]
 
         else:
+            logging.info(f"Scientist-publication relation already exists in the database")
             return result[0]
 
     def update_organization(self, name, organization_type):

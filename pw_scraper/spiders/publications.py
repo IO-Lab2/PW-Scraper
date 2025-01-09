@@ -20,7 +20,7 @@ class PublicationsSpider(scrapy.Spider):
 
     custom_settings = {
         'PLAYWRIGHT_ABORT_REQUEST': should_abort_request,
-        'PLAYWRIGHT_MAX_PAGES_PER_CONTEXT': 5,
+        'PLAYWRIGHT_MAX_PAGES_PER_CONTEXT': 10,
         'CONCURRENT_REQUESTS': 10,
     }
 
@@ -42,7 +42,6 @@ class PublicationsSpider(scrapy.Spider):
         # Generate requests for each page based on the total number of pages
         for page_number in range(1, 2):
             page_url = f'https://repo.pw.edu.pl/globalResultList.seam?r=publication&tab=PUBLICATION&lang=en&p=bst&pn={page_number}'
-
             yield scrapy.Request(url=page_url,
                 callback=self.parse_publications_links,
                 meta=dict(
@@ -51,14 +50,14 @@ class PublicationsSpider(scrapy.Spider):
                     playwright_context="pages",
                     errback=self.errback
                 ))
-            # await asyncio.sleep(1)
 
         await page.close()
 
     async def parse_publications_links(self, response):
         try:
             page = response.meta['playwright_page']
-            await page.wait_for_selector('//*[@id="entitiesT:0:j_id_3g_2_c_2_9a_2_2_1"]', state='visible')
+            await page.wait_for_selector('//*[@id="entitiesT_content"]', state='visible')
+            # await asyncio.sleep()
             elements = await page.evaluate('''() => {
                 return Array.from(document.querySelectorAll('div.entity-row-heading-wrapper h5 a')).map(el => el.href);
             }''')
