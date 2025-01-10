@@ -21,7 +21,7 @@ class PublicationsSpider(scrapy.Spider):
     custom_settings = {
         'PLAYWRIGHT_ABORT_REQUEST': should_abort_request,
         'PLAYWRIGHT_MAX_PAGES_PER_CONTEXT': 10,
-        'CONCURRENT_REQUESTS': 10,
+        'CONCURRENT_REQUESTS': 64,
     }
 
     pw_url = 'https://repo.pw.edu.pl'
@@ -40,7 +40,8 @@ class PublicationsSpider(scrapy.Spider):
         total_pages = await page.evaluate("parseInt(document.querySelector('span.entitiesDataListTotalPages').innerText.replace(',', ''))")
 
         # Generate requests for each page based on the total number of pages
-        for page_number in range(1, 2):
+        # Pages 1 to 750
+        for page_number in range(750, 1000):
             page_url = f'https://repo.pw.edu.pl/globalResultList.seam?r=publication&tab=PUBLICATION&lang=en&p=bst&pn={page_number}'
             yield scrapy.Request(url=page_url,
                 callback=self.parse_publications_links,
@@ -142,12 +143,13 @@ class PublicationsSpider(scrapy.Spider):
             m_scores=[s for s in m_scores if s and s.strip()!='']
             publication['ministerial_score']=m_scores[0] if m_scores else None
 
+            await page.close()
             
         except Exception as e:
             self.logger.error(f"Error in parsing publication {response.url}: {str(e)}")
         finally:
             if publication['authors'] and publication['title']:
-                yield publication
+                return publication
         
         await page.close()
         

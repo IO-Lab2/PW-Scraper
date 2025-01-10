@@ -11,6 +11,24 @@ import re
 class CleanItemsPipeline:
     # Clean items before saving to the database
     def process_item(self, item, spider):
+        """
+        Processes and cleans the fields of the given item before saving it.
+
+        This method uses the ItemAdapter to standardize access to item fields
+        and applies specific cleaning routines based on the type of item being processed.
+        For ScientistItem and PublicationItem, it cleans the fields by removing
+        unwanted whitespace and normalizing spaces. OrganizationItem is currently
+        processed without any additional cleaning.
+
+        Args:
+            item: The item to process, which can be an instance of ScientistItem,
+                PublicationItem, or OrganizationItem.
+            spider: The spider that scraped the item.
+
+        Returns:
+            The processed item after cleaning operations.
+        """
+
         adapter = ItemAdapter(item)
 
         if isinstance(item, ScientistItem):
@@ -28,6 +46,7 @@ class CleanItemsPipeline:
 
     def clean_fields(self, adapter):
         # Clean the fields of ScientistItem
+        
         for field_name in adapter.field_names():
             field_value = adapter.get(field_name)
 
@@ -138,7 +157,8 @@ class DatabasePipeline:
         elif isinstance(item, PublicationItem):
             logging.info(f"Database processing item: {adapter.get('title')}")
             authors = adapter.get('authors')
-            adapter['publication_date'] += '-01-01'
+            if adapter['publication_date']:
+                adapter['publication_date'] += '-01-01'
             if authors:
                 for author_id in authors:
                     publication_id = self.update_publication(adapter['title'],
