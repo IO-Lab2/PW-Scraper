@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 from pw_scraper.items import ScientistItem, PublicationItem, OrganizationItem
 import re
+from scrapy.exceptions import DropItem
 
 
 class CleanItemsPipeline:
@@ -32,6 +33,16 @@ class CleanItemsPipeline:
         adapter = ItemAdapter(item)
 
         if isinstance(item, ScientistItem):
+            if not adapter.get('academic_title'):
+                missing_field = 'academic title'
+                logging.warning(f"Item missing required field: {missing_field}")
+                raise DropItem('')
+                return None
+            
+            academic_title = adapter.get('academic_title')
+            if isinstance(academic_title, list):
+                adapter['academic_title'] = academic_title[0]
+                
             self.clean_fields(adapter)
 
         elif isinstance(item, PublicationItem):
@@ -41,7 +52,13 @@ class CleanItemsPipeline:
             # Seemingly no fields of item need to be cleaned
             pass
 
-        logging.info(f"Cleaned item: {adapter.get('title')}")
+        item_name = adapter.get('title')
+        if not item_name:
+            item_name = f"{adapter.get('last_name')} {adapter.get('first_name')}" if adapter.get('first_name') else None
+        if not item_name:
+            item_name = adapter.get('institute')
+            
+        logging.info(f"Cleaned item: {item_name}")
         return item
 
     def clean_fields(self, adapter):  
@@ -65,6 +82,9 @@ class CleanItemsPipeline:
                 # Replace multiple spaces with a single space
                 field_value = re.sub(r'\s+', ' ', field_value)
                 adapter[field_name] = field_value
+            
+            if field_value is None:
+                adapter[field_name] = ''
 
 
 class SaveToJsonFilePipeline:
@@ -306,10 +326,7 @@ class DatabasePipeline:
                             %s,
                             %s
                             )"""
-            try:
-                self.cur.execute(add_query, scientist_fields[:6])
-            except Exception as e:
-                logging.error(f"Error executing query inside update_scientist: {e}")
+            self.cur.execute(add_query, scientist_fields[:6])
 
             logging.info(
                 f"{adapter.get('first_name')} {adapter.get('last_name')} added to the database")
@@ -448,18 +465,18 @@ class DatabasePipeline:
             int: The id of the organization-organization relation in the database.
         """
         if parent_id is None:
-            self.cursor.execute(
+            self.cur.execute(
                 "SELECT id FROM organizations_relationships WHERE parent_id IS NULL AND child_id=%s;", (child_id,))
 
         elif child_id is None:
-            self.cursor.execute(
+            self.cur.execute(
                 "SELECT id FROM organizations_relationships WHERE parent_id=%s AND child_id IS NULL;", (parent_id,))
 
         else:
-            self.cursor.execute(
+            self.cur.execute(
                 "SELECT id FROM organizations_relationships WHERE parent_id=%s AND child_id=%s;", (parent_id, child_id))
 
-        if self.cursor.fetchone() is None:
+        if self.cur.fetchone() is None:
             insert_query = """
                             INSERT INTO 
                             organizations_relationships 
