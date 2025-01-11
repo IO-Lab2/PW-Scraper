@@ -44,9 +44,19 @@ class CleanItemsPipeline:
         logging.info(f"Cleaned item: {adapter.get('title')}")
         return item
 
-    def clean_fields(self, adapter):
-        # Clean the fields of ScientistItem
-        
+    def clean_fields(self, adapter):  
+        """
+        Cleans the fields of a ScientistItem or PublicationItem by stripping whitespace and normalizing spaces.
+
+        This method iterates over all fields of the given item adapter. For each field with
+        a string value, it performs the following cleaning operations:
+        1. Strips leading and trailing whitespace.
+        2. Replaces multiple consecutive spaces with a single space.
+
+        Args:
+            adapter (ItemAdapter): The adapter of the item containing the fields to be cleaned.
+        """
+
         for field_name in adapter.field_names():
             field_value = adapter.get(field_name)
 
@@ -57,7 +67,7 @@ class CleanItemsPipeline:
                 adapter[field_name] = field_value
 
 
-class pw_scraperPipeline:
+class SaveToJsonFilePipeline:
     def open_spider(self, spider):
         # Initialize JSON files
         self.organisation_file_path = 'organisation.json'
@@ -75,7 +85,16 @@ class pw_scraperPipeline:
         logging.info("Spider finished")
 
     def process_item(self, item, spider):
-        # Determine the file to save the item
+        """
+        Determines the appropriate JSON file to save the given item and appends it to that file.
+
+        Args:
+            item: The item to be saved.
+            spider: The spider that scraped the item.
+
+        Returns:
+            The processed item.
+        """
         if "university" in item:  # Organization item
             file_path = self.organisation_file_path
         elif "profile_url" in item and "first_name" not in item:  # Scientist link
@@ -114,6 +133,14 @@ class pw_scraperPipeline:
 
 class DatabasePipeline:
     def open_spider(self, spider):
+        """
+        This method is called when the spider is opened. It connects to the PostgreSQL
+        database using the environment variables set in the .env file. The connection
+        and cursor objects are stored as instance variables.
+
+        :param spider: The spider that is being opened.
+        :type spider: scrapy.Spider
+        """
         dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
         load_dotenv(dotenv_path=dotenv_path)
 
@@ -133,7 +160,17 @@ class DatabasePipeline:
         logging.info(f'Spider: {spider.name} connected to database')
 
     def process_item(self, item, spider):
-        # Update or insert the item into the appropriate table
+        """
+        Process the given item and update or insert it into the appropriate table.
+
+        Args:
+            item: The item to process, which can be an instance of ScientistItem, PublicationItem, or OrganizationItem.
+            spider: The spider that scraped the item.
+
+        Returns:
+            The processed item, or None if the item was not processed.
+        """
+       
         adapter = ItemAdapter(item)
 
         if isinstance(item, ScientistItem):
@@ -209,6 +246,16 @@ class DatabasePipeline:
         logging.info(f'Spider: {spider.name}Database connection closed')
 
     def update_scientist(self, adapter, scientist_fields):
+        """
+        Updates a scientist in the database if it already exists, otherwise it adds the scientist to the database.
+
+        Args:
+            adapter (ItemAdapter): The adapter of the item that contains the scientist's information.
+            scientist_fields (list): A list of fields of the scientist to be updated or added.
+
+        Returns:
+            int: The id of the scientist in the database.
+        """
         email = adapter.get('email')
 
         search_query = """
@@ -231,7 +278,10 @@ class DatabasePipeline:
                                     position=%s
                                 WHERE email = %s;
                                 """
-                self.cur.execute(update_query, (email,))
+                try:
+                    self.cur.execute(update_query, (email,))
+                except Exception as e:
+                    logging.error(f"Error executing query inside update_scientist: {e}")
 
                 logging.info(
                     f"{adapter.get('first_name')} {adapter.get('last_name')} updated in the database")
@@ -256,12 +306,29 @@ class DatabasePipeline:
                             %s,
                             %s
                             )"""
-            self.cur.execute(add_query, scientist_fields[:6])
+            try:
+                self.cur.execute(add_query, scientist_fields[:6])
+            except Exception as e:
+                logging.error(f"Error executing query inside update_scientist: {e}")
+
             logging.info(
                 f"{adapter.get('first_name')} {adapter.get('last_name')} added to the database")
             return self.cur.fetchone()[0]
 
     def update_publication(self, title, publisher, publication_date, journal, ministerial_score):
+        """
+        Updates a publication in the database if it already exists, or inserts a new one if it doesn't.
+
+        Args:
+            title: The title of the publication.
+            publisher: The publisher of the publication.
+            publication_date: The publication date of the publication (in ISO 8601 format).
+            journal: The name of the journal the publication was published in.
+            ministerial_score: The ministerial score of the publication.
+
+        Returns:
+            The id of the publication in the database.
+        """
         try:
             select_query = "SELECT id, journal, ministerial_score FROM publications WHERE title = %s AND (publication_date = %s OR publication_date IS NULL);"
             self.cur.execute(select_query, (title, publication_date))
@@ -303,6 +370,16 @@ class DatabasePipeline:
             return self.cur.fetchone()[0]
 
     def update_author_publications(self, scientist_id, publication_id):
+        """
+        Updates the scientist-publication relation in the database if it already exists, or inserts a new one if it doesn't.
+
+        Args:
+            scientist_id (int): The id of the scientist.
+            publication_id (int): The id of the publication.
+
+        Returns:
+            int: The id of the scientist-publication relation in the database.
+        """
         select_query = """
                     SELECT scientist_id 
                     FROM scientists_publications
@@ -332,6 +409,17 @@ class DatabasePipeline:
             return result[0]
 
     def update_organization(self, name, organization_type):
+        """
+        Updates an organization in the database if it already exists, or inserts a new one if it doesn't.
+
+        Args:
+            name (str): The name of the organization.
+            organization_type (str): The type of the organization.
+
+        Returns:
+            int: The id of the organization in the database.
+        """
+
         select_query = "SELECT id FROM organizations WHERE name like %s AND type=%s;"
         self.cur.execute(select_query, (name, organization_type))
         result = self.cur.fetchone()
@@ -349,6 +437,16 @@ class DatabasePipeline:
             return self.cur.fetchone()[0]
 
     def update_organization_relationship(self, parent_id, child_id):
+        """
+        Updates an organization-organization relation in the database if it already exists, or inserts a new one if it doesn't.
+
+        Args:
+            parent_id (int): The id of the parent organization.
+            child_id (int): The id of the child organization.
+
+        Returns:
+            int: The id of the organization-organization relation in the database.
+        """
         if parent_id is None:
             self.cursor.execute(
                 "SELECT id FROM organizations_relationships WHERE parent_id IS NULL AND child_id=%s;", (child_id,))
@@ -370,6 +468,16 @@ class DatabasePipeline:
             self.cur.execute(insert_query, (parent_id, child_id))
 
     def update_scientist_bibliometrics(self, scientist_id, scientist_fields):
+        """
+        Updates a scientist's bibliometrics in the database if it already exists, otherwise it adds the bibliometrics to the database.
+
+        Args:
+            scientist_id (int): The id of the scientist.
+            scientist_fields (list): A list of fields of the scientist's bibliometrics to be updated or added.
+
+        Returns:
+            int: The id of the bibliometrics in the database.
+        """
         select_query = """
                     SELECT
                         h_index_wos,
@@ -379,7 +487,10 @@ class DatabasePipeline:
                     FROM bibliometrics
                     WHERE scientist_id = %s;
                     """
-        self.cur.execute(select_query, (scientist_id,))
+        try:
+            self.cur.execute(select_query, (scientist_id,))
+        except Exception as e:
+            logging.error(f"Error select inside update_scientist_bibliometrics query: {e}")
 
         bibliometrics_db_check = self.cur.fetchone()
 
@@ -395,8 +506,13 @@ class DatabasePipeline:
                                 updated_at = CURRENT_TIMESTAMP
                             WHERE scientist_id = %s;
                             """
-                self.cur.execute(
+                try:
+                    self.cur.execute(
                     update_query, scientist_fields + (scientist_id,))
+                except Exception as e:
+                    logging.error(f"Error update inside update_scientist_bibliometrics query: {e}")
+
+            logging.info(f"Bibliometrics in the database updated")
 
         else:
             insert_query = """
@@ -404,9 +520,24 @@ class DatabasePipeline:
                             bibliometrics 
                             (h_index_wos, h_index_scopus, publication_count, ministerial_score, scientist_id) 
                             VALUES (%s, %s, %s, %s, %s) RETURNING id;"""
-            self.cur.execute(insert_query, scientist_fields + (scientist_id,))
+            try:
+                self.cur.execute(insert_query, scientist_fields + (scientist_id,))
+            except Exception as e:
+                logging.error(f"Error insert inside update_scientist_bibliometrics query: {e}")
+
+            logging.info(f"Bibliometrics added to the database")
 
     def update_scientist_relationship(self, scientist_id, adapter):
+        """
+        Updates a scientist's organizations in the database if they already exist, otherwise it adds the organizations to the database.
+
+        Args:
+            scientist_id (int): The id of the scientist.
+            adapter (ItemAdapter): The adapter of the item that contains the scientist's information.
+
+        Returns:
+            None
+        """
         organizations = adapter.get('organizations')
         for key in organizations:
             select_organization_query = "SELECT id FROM organizations WHERE name like %s;"
@@ -418,8 +549,11 @@ class DatabasePipeline:
                                 FROM scientist_organization so 
                                 INNER JOIN organizations o ON so.organization_id = o.id
                                 WHERE scientist_id = %s AND type=%s;"""
-            self.cur.execute(select_query, (scientist_id, key))
-            scientist_organization_check = self.cur.fetchone()
+            try:
+                self.cur.execute(select_query, (scientist_id, key))
+                scientist_organization_check = self.cur.fetchone()
+            except Exception as e:
+                logging.error(f"Error select inside update_scientist_relationship query: {e}")
 
             if scientist_organization_check:
                 if scientist_organization_check[0] != organization_id:
@@ -430,8 +564,16 @@ class DatabasePipeline:
                                     updated_at = CURRENT_TIMESTAMP
                                 WHERE id = %s;
                                 """
-                    self.cur.execute(
-                        update_query, (organization_id, scientist_organization_check[1]))
+                    try:
+                        self.cur.execute(
+                            update_query, (organization_id, scientist_organization_check[1]))
+                    except Exception as e:
+                        logging.error(f"Error update inside update_scientist_relationship query: {e}")
+                    
+                    logging.info(f"Organization in the database updated")
+
+                else:
+                    logging.info(f"Organization in the database not updated")
 
             else:
                 insert_query = """
@@ -440,25 +582,53 @@ class DatabasePipeline:
                                 (scientist_id, organization_id) 
                                 VALUES (%s, %s);
                                 """
-                self.cur.execute(insert_query, (scientist_id, organization_id))
+                try:
+                    self.cur.execute(insert_query, (scientist_id, organization_id))
+                except Exception as e:
+                    logging.error(f"Error insert inside update_scientist_relationship query: {e}")
+
+                logging.info(f"Organization added to the database")
 
     def update_research_area(self, adapter, scientist_id):
+        """
+        Updates a scientist's research areas in the database if they already exist, otherwise it adds the research areas to the database.
+
+        This function first checks if each research area associated with the scientist exists in the database. If a research area 
+        doesn't exist, it inserts the new research area and retrieves its ID. It then establishes a relationship between the 
+        scientist and each research area by inserting entries into the scientists_research_areas table.
+
+        Args:
+            adapter (ItemAdapter): The adapter of the item that contains the scientist's information, including research areas.
+            scientist_id (int): The id of the scientist.
+
+        Returns:
+            None
+        """
+
         research_area_ids = []
         research_areas = adapter.get('research_area')
 
         for research_area in research_areas:
-            self.cur.execute(
-                f"SELECT id FROM research_areas WHERE name like '{research_area}';")
-            in_db = self.cur.fetchone()
+            try:
+                self.cur.execute(
+                    f"SELECT id FROM research_areas WHERE name like '{research_area}';")
+                in_db = self.cur.fetchone()
+            except Exception as e:
+                logging.error(f"Error select inside update_research_area query: {e}")
 
             if in_db:
                 research_area_ids.append(in_db[0])
 
             else:
                 insert_query = "INSERT INTO research_areas (name) VALUES (%s) RETURNING id;"
-                self.cur.execute(insert_query, (research_area,))
-                research_area_ids.append(self.cur.fetchone()[0])
+                try:
+                    self.cur.execute(insert_query, (research_area,))
+                    research_area_ids.append(self.cur.fetchone()[0])
+                except Exception as e:
+                    logging.error(f"Error insert inside update_research_area query: {e}")
 
+                logging.info(f"Research area added to the database")
+        
         select_query = "SELECT research_area_id FROM scientists_research_areas WHERE scientist_id = %s;"
         self.cur.execute(select_query, (scientist_id,))
 
@@ -467,4 +637,9 @@ class DatabasePipeline:
         for ra_id in research_area_ids:
             if ra_id not in ra_result:
                 insert_query = "INSERT INTO scientists_research_areas (scientist_id, research_area_id) VALUES (%s, %s);"
-                self.cur.execute(insert_query, (scientist_id, ra_id))
+                try:
+                    self.cur.execute(insert_query, (scientist_id, ra_id))
+                except Exception as e:
+                    logging.error(f"Error insert inside update_research_area query: {e}")
+
+                logging.info(f"Scientist-research area relation added to the database")

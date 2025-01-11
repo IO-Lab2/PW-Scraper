@@ -6,3 +6,5 @@ GitPython==3.1.41
 psycopg
 setuptools==69.0.3
 smmap==5.0.1
+python-dotenv
+BeautifulSoup
