@@ -206,19 +206,19 @@ class PwSpider(scrapy.Spider):
         except Exception as e:
             self.logger.error(f'Error in parse_scientist, {e} {response.url}')
         finally:
-            
-            yield scrapy.FormRequest(url=response.url,
-                formdata=formdata,
-                headers=self.headers,
-                callback=self.bibliometric,
-                meta=dict(first_name=first_name, 
-                            last_name=last_name, 
-                            email=email, 
-                            academic_title=academic_title, 
-                            position=position, 
-                            organization=organization, 
-                            research_area=research_area, 
-                            profile_url=profile_url))
+            if research_area and academic_title:    
+                yield scrapy.FormRequest(url=response.url,
+                    formdata=formdata,
+                    headers=self.headers,
+                    callback=self.bibliometric,
+                    meta=dict(first_name=first_name, 
+                                last_name=last_name, 
+                                email=email, 
+                                academic_title=academic_title, 
+                                position=position, 
+                                organization=organization, 
+                                research_area=research_area, 
+                                profile_url=profile_url))
 
             
 
