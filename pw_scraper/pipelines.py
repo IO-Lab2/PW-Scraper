@@ -38,10 +38,6 @@ class CleanItemsPipeline:
                 logging.warning(f"Item missing required field: {missing_field}")
                 raise DropItem('')
                 return None
-            
-            academic_title = adapter.get('academic_title')
-            if isinstance(academic_title, list):
-                adapter['academic_title'] = academic_title[0]
                 
             self.clean_fields(adapter)
 
@@ -82,9 +78,6 @@ class CleanItemsPipeline:
                 # Replace multiple spaces with a single space
                 field_value = re.sub(r'\s+', ' ', field_value)
                 adapter[field_name] = field_value
-            
-            if field_value is None:
-                adapter[field_name] = ''
 
 
 class SaveToJsonFilePipeline:
@@ -207,7 +200,7 @@ class DatabasePipeline:
             self.update_scientist_relationship(scientist_id, adapter)
 
             # scientist_research_areas table
-            self.update_research_area(scientist_id)
+            self.update_research_area(adapter, scientist_id)
 
             return item
 
@@ -227,11 +220,11 @@ class DatabasePipeline:
                     select_query = "SELECT id FROM scientists WHERE profile_url like %s;"
                     try:
                         self.cur.execute(select_query, ('%' + author_id + '%',))
-                        result = self.cur.fetchone()
                     except Exception as e:
                         logging.error(f"Error executing query: {e}")
+                    result = self.cur.fetchone() if self.cur.rowcount > 0 else None
 
-                    if result:
+                    if result is not None:
                         scientist_id = result[0]
                         self.update_author_publications(
                             scientist_id, publication_id)
@@ -309,28 +302,37 @@ class DatabasePipeline:
             return scientist_db_check[0]
         else:
             add_query = """ 
-                    INSERT INTO
-                    scientists (
-                        first_name,
-                        last_name,
-                        academic_title,
-                        email,
-                        profile_url,
-                        position
-                    )
-                    VALUES (
-                            %s,
-                            %s,
-                            %s,
-                            %s,
-                            %s,
-                            %s
-                            )"""
-            self.cur.execute(add_query, scientist_fields[:6])
+                INSERT INTO
+                scientists (
+                    first_name,
+                    last_name,
+                    academic_title,
+                    email,
+                    profile_url,
+                    position
+                )
+                VALUES (
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                ) RETURNING id;"""
 
-            logging.info(
-                f"{adapter.get('first_name')} {adapter.get('last_name')} added to the database")
-            return self.cur.fetchone()[0]
+            self.cur.execute(add_query, scientist_fields[:6])
+            result = self.cur.fetchone()  
+
+            if result and result[0] is not None: 
+                scientist_id = result[0]
+                logging.info(
+                    f"{adapter.get('first_name')} {adapter.get('last_name')} added to the database with ID {scientist_id}"
+                )
+                return scientist_id
+            else:
+                logging.warning(f"Failed to insert {adapter.get('first_name')} {adapter.get('last_name')} into the database")
+                return None
+
 
     def update_publication(self, title, publisher, publication_date, journal, ministerial_score):
         """
@@ -484,7 +486,7 @@ class DatabasePipeline:
                             VALUES (%s, %s) RETURNING id;"""
             self.cur.execute(insert_query, (parent_id, child_id))
 
-    def update_scientist_bibliometrics(self, scientist_id, scientist_fields):
+    def update_scientist_bibliometrics(self, adapter, scientist_id, scientist_fields):
         """
         Updates a scientist's bibliometrics in the database if it already exists, otherwise it adds the bibliometrics to the database.
 
@@ -525,7 +527,7 @@ class DatabasePipeline:
                             """
                 try:
                     self.cur.execute(
-                    update_query, scientist_fields + (scientist_id,))
+                    update_query, scientist_fields + (str(scientist_id),))
                 except Exception as e:
                     logging.error(f"Error update inside update_scientist_bibliometrics query: {e}")
 
@@ -533,16 +535,26 @@ class DatabasePipeline:
 
         else:
             insert_query = """
-                            INSERT INTO 
-                            bibliometrics 
-                            (h_index_wos, h_index_scopus, publication_count, ministerial_score, scientist_id) 
-                            VALUES (%s, %s, %s, %s, %s) RETURNING id;"""
+                INSERT INTO 
+                bibliometrics 
+                (h_index_wos, h_index_scopus, publication_count, ministerial_score, scientist_id) 
+                VALUES (%s, %s, %s, %s, %s) RETURNING id;"""
             try:
-                self.cur.execute(insert_query, scientist_fields + (scientist_id,))
+                ministerial_score = scientist_fields[3].replace(',', '.').strip()
+
+                # Validate ministerial_score
+                if ministerial_score.isdigit() or (ministerial_score.replace('.', '', 1).isdigit() and ministerial_score.count('.') <= 1):
+                    rounded_score = round(float(ministerial_score))  # Convert to float and round
+                else:
+                    rounded_score = 0  # Default value for invalid ministerial scores
+
+                self.cur.execute(insert_query, scientist_fields[:3] + (rounded_score,) + (str(scientist_id),))
             except Exception as e:
                 logging.error(f"Error insert inside update_scientist_bibliometrics query: {e}")
 
-            logging.info(f"Bibliometrics added to the database")
+        logging.info("Bibliometrics added to the database")
+
+
 
     def update_scientist_relationship(self, scientist_id, adapter):
         """
@@ -556,6 +568,10 @@ class DatabasePipeline:
             None
         """
         organizations = adapter.get('organizations')
+        
+        if not organizations:
+            return
+        
         for key in organizations:
             select_organization_query = "SELECT id FROM organizations WHERE name like %s;"
             self.cur.execute(select_organization_query, {organizations[key]})

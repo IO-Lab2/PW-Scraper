@@ -180,18 +180,46 @@ class PwSpider(scrapy.Spider):
 
 
             academic_title=response.css('div.careerAchievementListPanel ul.careerAchievementList li span.achievementName span::text').getall() or None
+            
+            if academic_title:
+                
+                if isinstance(academic_title, list):
+                    academic_title = academic_title[0]
+            
+                # Map of raw input to valid enum values
+                academic_title_map = {
+                    'Doctor': 'DSc',
+                    'Ph.D.': 'PhD',
+                    'Professor': 'Prof.',
+                    'Master Of Science': 'MSc',
+                    'Bachelor Of Science': 'BSc',
+                    'Professor Assistant' : 'BSc'
+                }
+                
+                # Normalize academic title  
+                academic_title = academic_title_map.get(academic_title, academic_title)
+
+                # Log a warning if the academic title is invalid
+                valid_titles = {'PhD', 'DSc', 'Prof.', 'DVM', 'MSc', 'BSc'}
+                if academic_title not in valid_titles:
+                    self.logger.warning(f"Invalid academic title: {academic_title}")
+
 
             profile_url= response.url
-            position=personal_data.css('p.possitionInfo span::text').get() or None
+            position=personal_data.css('p.possitionInfo span::text').get() or ''
 
             organization_scientist=personal_data.css('ul.authorAffilList li span a>span::text').getall()
-            organization=organization_scientist if organization_scientist else None
+            organization=organization_scientist if organization_scientist else ''
 
             research_area=response.css('div.researchFieldsPanel ul.ul-element-wcag li span::text').getall()
-            research_area=research_area if research_area else None
-
-
-            formdata = {
+            research_area=research_area if research_area else ''
+            
+        except Exception as e:
+            self.logger.error(f'Error in parse_scientist, {e} {response.url}')
+            
+        if academic_title:    
+            yield scrapy.FormRequest(url=response.url,
+                formdata={
                 'javax.faces.partial.ajax': 'true',
                 'javax.faces.source': 'j_id_22_1_1_8_7_3_4d',
                 'primefaces.ignoreautoupdate': 'true',
@@ -199,26 +227,17 @@ class PwSpider(scrapy.Spider):
                 'javax.faces.partial.render': 'j_id_22_1_1_8_7_3_4d',
                 'j_id_22_1_1_8_7_3_4d': 'j_id_22_1_1_8_7_3_4d',
                 'j_id_22_1_1_8_7_3_4d_load': 'true',
-            }
-            
-
-            
-        except Exception as e:
-            self.logger.error(f'Error in parse_scientist, {e} {response.url}')
-        finally:
-            if research_area and academic_title:    
-                yield scrapy.FormRequest(url=response.url,
-                    formdata=formdata,
-                    headers=self.headers,
-                    callback=self.bibliometric,
-                    meta=dict(first_name=first_name, 
-                                last_name=last_name, 
-                                email=email, 
-                                academic_title=academic_title, 
-                                position=position, 
-                                organization=organization, 
-                                research_area=research_area, 
-                                profile_url=profile_url))
+            },
+                headers=self.headers,
+                callback=self.bibliometric,
+                meta=dict(first_name=first_name, 
+                            last_name=last_name, 
+                            email=email, 
+                            academic_title=academic_title, 
+                            position=position, 
+                            organization=organization, 
+                            research_area=research_area, 
+                            profile_url=profile_url))
 
             
 
