@@ -158,8 +158,8 @@ class DatabasePipeline:
         load_dotenv(dotenv_path=dotenv_path)
 
         self.hostname = os.getenv("PGHOST")
-        self.scraper_username = os.getenv("PGUSERSCRAPER")
-        self.scraper_password = os.getenv("PGPASSWORDSCRAPER")
+        self.scraper_username = os.getenv("PGUSER")
+        self.scraper_password = os.getenv("PGPASSWORD")
         self.port = os.getenv("PGPORT")
         self.database = os.getenv("PGDATABASE")
         
@@ -270,7 +270,7 @@ class DatabasePipeline:
             int: The id of the scientist in the database.
         """
         email = adapter.get('email')
-
+        
         search_query = """
             SELECT id, first_name, last_name, academic_title, email, profile_url, position FROM scientists WHERE email = %s;
         """
@@ -301,6 +301,7 @@ class DatabasePipeline:
 
             return scientist_db_check[0]
         else:
+            logging.log(logging.INFO, f"Adding {adapter.get('first_name')} {adapter.get('last_name')} to the database")
             add_query = """ 
                 INSERT INTO
                 scientists (
@@ -319,6 +320,7 @@ class DatabasePipeline:
                     %s,
                     %s
                 ) RETURNING id;"""
+            logging.info(f"Executing query: {add_query} with values: {scientist_fields[:6]}")
 
             self.cur.execute(add_query, scientist_fields[:6])
             result = self.cur.fetchone()  
@@ -328,6 +330,7 @@ class DatabasePipeline:
                 logging.info(
                     f"{adapter.get('first_name')} {adapter.get('last_name')} added to the database with ID {scientist_id}"
                 )
+                self.connection.commit()
                 return scientist_id
             else:
                 logging.warning(f"Failed to insert {adapter.get('first_name')} {adapter.get('last_name')} into the database")

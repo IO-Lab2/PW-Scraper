@@ -216,28 +216,29 @@ class PwSpider(scrapy.Spider):
             
         except Exception as e:
             self.logger.error(f'Error in parse_scientist, {e} {response.url}')
-            
-        if academic_title:    
-            yield scrapy.FormRequest(url=response.url,
-                formdata={
-                'javax.faces.partial.ajax': 'true',
-                'javax.faces.source': 'j_id_22_1_1_8_7_3_4d',
-                'primefaces.ignoreautoupdate': 'true',
-                'javax.faces.partial.execute': 'j_id_22_1_1_8_7_3_4d',
-                'javax.faces.partial.render': 'j_id_22_1_1_8_7_3_4d',
-                'j_id_22_1_1_8_7_3_4d': 'j_id_22_1_1_8_7_3_4d',
-                'j_id_22_1_1_8_7_3_4d_load': 'true',
-            },
-                headers=self.headers,
-                callback=self.bibliometric,
-                meta=dict(first_name=first_name, 
-                            last_name=last_name, 
-                            email=email, 
-                            academic_title=academic_title, 
-                            position=position, 
-                            organization=organization, 
-                            research_area=research_area, 
-                            profile_url=profile_url))
+
+        finally:    
+            if academic_title and research_area:    
+                yield scrapy.FormRequest(url=response.url,
+                    formdata={
+                    'javax.faces.partial.ajax': 'true',
+                    'javax.faces.source': 'j_id_22_1_1_8_7_3_4d',
+                    'primefaces.ignoreautoupdate': 'true',
+                    'javax.faces.partial.execute': 'j_id_22_1_1_8_7_3_4d',
+                    'javax.faces.partial.render': 'j_id_22_1_1_8_7_3_4d',
+                    'j_id_22_1_1_8_7_3_4d': 'j_id_22_1_1_8_7_3_4d',
+                    'j_id_22_1_1_8_7_3_4d_load': 'true',
+                },
+                    headers=self.headers,
+                    callback=self.bibliometric,
+                    meta=dict(first_name=first_name, 
+                                last_name=last_name, 
+                                email=email, 
+                                academic_title=academic_title, 
+                                position=position, 
+                                organization=organization, 
+                                research_area=research_area, 
+                                profile_url=profile_url))
 
             
 
